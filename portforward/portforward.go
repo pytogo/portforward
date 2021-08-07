@@ -6,16 +6,21 @@ import "C"
 import "fmt"
 
 //export portforward
-func portforward(self *C.PyObject, args *C.PyObject) {
+func portforward(self *C.PyObject, args *C.PyObject) C.Py_None {
 	var fromPort C.int
 	var toPort C.int
 
 	if C.PyArg_ParseTuple_ll(args, &fromPort, &toPort) == 0 {
 		fmt.Println("Could not parse args")
-		return
+
+		C.Py_IncRef(C.Py_None)
+		return C.Py_None
 	}
 
 	fmt.Printf("Portforward from %d to %d", fromPort, toPort)
+
+	C.Py_IncRef(C.Py_None)
+	return C.Py_None
 }
 
 func main() {}
