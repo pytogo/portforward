@@ -6,7 +6,7 @@ import "C"
 import "fmt"
 
 //export portforward
-func portforward(self *C.PyObject, args *C.PyObject) C.Py_None {
+func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var fromPort C.int
 	var toPort C.int
 
