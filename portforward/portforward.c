@@ -1,7 +1,7 @@
 #include <Python.h>
 
 /* Will come from go */
-PyObject* port_forward(PyObject* , PyObject*);
+PyObject* forward(PyObject* , PyObject*);
 
 /*
 To shim go's missing variadic function support.
