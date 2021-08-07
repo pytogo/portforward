@@ -1,7 +1,7 @@
 #include <Python.h>
 
 /* Will come from go */
-PyObject* portforward(PyObject* , PyObject*);
+PyObject* port_forward(PyObject* , PyObject*);
 
 /*
 To shim go's missing variadic function support.
@@ -13,7 +13,7 @@ int PyArg_ParseTuple_ssll(PyObject* args, char** a, char** b, int* c, int* d) {
 }
 
 static struct PyMethodDef methods[] = {
-    {"portforward", (PyCFunction)portforward, METH_VARARGS},
+    {"forward", (PyCFunction)forward, METH_VARARGS},
     {NULL, NULL}
 };
 
