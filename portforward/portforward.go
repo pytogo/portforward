@@ -20,6 +20,7 @@ import (
 
 //export forward
 func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
+	// Interface for C extension and only part that contains C.
 	var namespace *C.char
 	var podName *C.char
 
@@ -44,6 +45,7 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	return C.Py_None
 }
 
+// portForward connects to a Pod and tunnels traffic from a local port to this pod.
 func portForward(namespace, podName string, fromPort, toPort int) error {
 
 	fmt.Printf("PortForward %s/%s (%d:%d)\n", namespace, podName, fromPort, toPort)

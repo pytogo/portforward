@@ -13,14 +13,14 @@ int PyArg_ParseTuple_ssll(PyObject* args, char** a, char** b, int* c, int* d) {
 }
 
 static struct PyMethodDef methods[] = {
-    {"forward", (PyCFunction)forward, METH_VARARGS},
-    {NULL, NULL}
+    {"forward", (PyCFunction)forward, METH_VARARGS, "Connects to a Pod and tunnels traffic from a local port to this pod"},
+    {NULL, NULL, 0, NULL}
 };
 
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
     "portforward",
-    NULL,
+    "Kubernetes Port-Forward Go-Edition For Python",
     -1,
     methods
 };
