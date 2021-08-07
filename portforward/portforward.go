@@ -7,8 +7,8 @@ import "fmt"
 
 //export portforward
 func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
-	var namespace *C.char
-	var podName *C.char
+	var namespace C.char
+	var podName C.char
 
 	var fromPort C.int
 	var toPort C.int
