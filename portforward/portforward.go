@@ -7,8 +7,8 @@ import "fmt"
 
 //export portforward
 func portforward(self *C.PyObject, args *C.PyObject) {
-	var fromPort int
-	var toPort int
+	var fromPort C.int
+	var toPort C.int
 
 	if C.PyArg_ParseTuple_ll(args, &fromPort, &toPort) == 0 {
 		fmt.Println("Could not parse args")

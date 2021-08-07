@@ -5,7 +5,7 @@ PyObject* portforward(PyObject* , PyObject*);
 
 /* To shim go's missing variadic function support */
 int PyArg_ParseTuple_ll(PyObject* args, int* a, int* b) {
-    return PyArg_ParseTuple(args, "II", a, b);
+    return PyArg_ParseTuple(args, "ii", a, b);
 }
 
 static struct PyMethodDef methods[] = {
