@@ -1,14 +1,14 @@
 package main
 
 // #include <Python.h>
-// int PyArg_ParseTuple_ssll(PyObject*, char*, char*, int*, int*);
+// int PyArg_ParseTuple_ssll(PyObject*, char**, char**, int*, int*);
 import "C"
 import "fmt"
 
 //export portforward
 func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
-	var namespace C.char
-	var podName C.char
+	var namespace *C.char
+	var podName *C.char
 
 	var fromPort C.int
 	var toPort C.int
@@ -20,10 +20,13 @@ func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 		return C.Py_None
 	}
 
-	var ns string = C.GoString(&namespace)
-	var pod string = C.GoString(&podName)
+	var ns string = C.GoString(namespace)
+	var pod string = C.GoString(podName)
 
-	fmt.Printf("%s/%s: Port forward from %d to %d", ns, pod, fromPort, toPort)
+	from := uint(fromPort)
+	to := uint(toPort)
+
+	fmt.Printf("%s/%s: Port forward from %d to %d", ns, pod, from, to)
 
 	C.Py_IncRef(C.Py_None)
 	return C.Py_None
