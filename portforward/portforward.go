@@ -20,8 +20,8 @@ func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 		return C.Py_None
 	}
 
-	var ns string = C.GoString(namespace)
-	var pod string = C.GoString(podName)
+	var ns string = C.GoString(&namespace)
+	var pod string = C.GoString(&podName)
 
 	fmt.Printf("%s/%s: Port forward from %d to %d", ns, pod, fromPort, toPort)
 
