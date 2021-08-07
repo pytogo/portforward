@@ -3,9 +3,13 @@
 /* Will come from go */
 PyObject* portforward(PyObject* , PyObject*);
 
-/* To shim go's missing variadic function support */
-int PyArg_ParseTuple_ll(PyObject* args, int* a, int* b) {
-    return PyArg_ParseTuple(args, "ii", a, b);
+/*
+To shim go's missing variadic function support.
+
+Ref https://docs.python.org/3/c-api/arg.html
+*/
+int PyArg_ParseTuple_ssll(PyObject* args, char* a, char* b, int* c, int* d) {
+    return PyArg_ParseTuple(args, "ssii", a, b, c, d);
 }
 
 static struct PyMethodDef methods[] = {
