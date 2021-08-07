@@ -13,7 +13,7 @@ func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var fromPort C.int
 	var toPort C.int
 
-	if C.PyArg_ParseTuple_ll(args, &namespace, &podName, &fromPort, &toPort) == 0 {
+	if C.PyArg_ParseTuple_ssll(args, &namespace, &podName, &fromPort, &toPort) == 0 {
 		fmt.Println("Could not parse args")
 
 		C.Py_IncRef(C.Py_None)
