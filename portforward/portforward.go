@@ -23,13 +23,18 @@ func portforward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var ns string = C.GoString(namespace)
 	var pod string = C.GoString(podName)
 
-	from := uint(fromPort)
-	to := uint(toPort)
-
-	fmt.Printf("%s/%s: Port forward from %d to %d", ns, pod, from, to)
+	if err := forward(ns, pod, int(fromPort), int(toPort)); err != nil {
+		panic(err)
+	}
 
 	C.Py_IncRef(C.Py_None)
 	return C.Py_None
+}
+
+func forward(namespace, podName string, fromPort, toPort int) error {
+	fmt.Printf("%s/%s: Port forward from %d to %d", namespace, podName, fromPort, toPort)
+
+	return nil
 }
 
 func main() {}
