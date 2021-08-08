@@ -34,3 +34,5 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	C.Py_IncRef(C.Py_None)
 	return C.Py_None
 }
+
+func main() {}

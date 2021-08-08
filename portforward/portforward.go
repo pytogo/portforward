@@ -111,5 +111,3 @@ func startForward(dialer httpstream.Dialer, ports string, stopChan, readyChan ch
 
 	return nil
 }
-
-func main() {}
