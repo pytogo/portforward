@@ -1,8 +1,5 @@
-package main
+package portforward
 
-// #include <Python.h>
-// int PyArg_ParseTuple_ssll(PyObject*, char**, char**, int*, int*);
-import "C"
 import (
 	"bytes"
 	"fmt"
@@ -18,35 +15,8 @@ import (
 	"strings"
 )
 
-//export forward
-func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
-	// Interface for C extension and only part that contains C.
-	var namespace *C.char
-	var podName *C.char
-
-	var fromPort C.int
-	var toPort C.int
-
-	if C.PyArg_ParseTuple_ssll(args, &namespace, &podName, &fromPort, &toPort) == 0 {
-		fmt.Println("Could not parse args")
-
-		C.Py_IncRef(C.Py_None)
-		return C.Py_None
-	}
-
-	var ns string = C.GoString(namespace)
-	var pod string = C.GoString(podName)
-
-	if err := portForward(ns, pod, int(fromPort), int(toPort)); err != nil {
-		panic(err)
-	}
-
-	C.Py_IncRef(C.Py_None)
-	return C.Py_None
-}
-
-// portForward connects to a Pod and tunnels traffic from a local port to this pod.
-func portForward(namespace, podName string, fromPort, toPort int) error {
+// PortForward connects to a Pod and tunnels traffic from a local port to this pod.
+func PortForward(namespace, podName string, fromPort, toPort int) error {
 
 	fmt.Printf("PortForward %s/%s (%d:%d)\n", namespace, podName, fromPort, toPort)
 

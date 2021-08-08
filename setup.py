@@ -1,8 +1,6 @@
 #!/usr/bin/env python
 
 """The setup script."""
-import platform
-import sys
 
 from setuptools import setup, find_packages, Extension
 
@@ -12,7 +10,7 @@ with open("README.rst") as readme_file:
 with open("HISTORY.rst") as history_file:
     history = history_file.read()
 
-requirements = [ ]
+requirements = []
 
 test_requirements = ["pytest>=3", ]
 
@@ -48,7 +46,7 @@ setup(
     build_golang={'root': 'github.com/pytogo/portforward'},
     ext_modules=[
         Extension(
-            "portforward", ["portforward/portforward.go"],
+            "portforward", ["main.go"],
             py_limited_api=True, define_macros=[('Py_LIMITED_API', None)],
         )
     ]
