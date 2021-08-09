@@ -5,7 +5,7 @@ package main
 import "C"
 import (
 	"fmt"
-	"github.com/pytogo/portforward/portforward"
+	"github.com/pytogo/portforward/internal_portforward"
 )
 
 //export forward
@@ -27,7 +27,7 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var ns string = C.GoString(namespace)
 	var pod string = C.GoString(podName)
 
-	if err := portforward.PortForward(ns, pod, int(fromPort), int(toPort)); err != nil {
+	if err := internal_portforward.ForwardByHome(ns, pod, int(fromPort), int(toPort)); err != nil {
 		panic(err)
 	}
 

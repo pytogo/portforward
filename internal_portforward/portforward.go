@@ -1,4 +1,4 @@
-package portforward
+package internal_portforward
 
 import (
 	"bytes"
@@ -15,8 +15,8 @@ import (
 	"strings"
 )
 
-// PortForward connects to a Pod and tunnels traffic from a local port to this pod.
-func PortForward(namespace, podName string, fromPort, toPort int) error {
+// ForwardByHome connects to a Pod and tunnels traffic from a local port to this pod.
+func ForwardByHome(namespace, podName string, fromPort, toPort int) error {
 
 	// CONFIG
 	var config *rest.Config
