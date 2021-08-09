@@ -10,6 +10,10 @@ def forward_by_home(namespace: str, pod: str, from_port: int, to_port: int) -> N
     Connects to a Pod and tunnels traffic from a local port to this pod.
     It uses the kubectl kube config from the home dir.
 
+    Example:
+        >>> import portforward
+        >>> portforward.forward_by_home("test", "web", 9000, 80)
+
     :param namespace: Target namespace
     :param pod: Name of target Pod
     :param from_port: Local port
