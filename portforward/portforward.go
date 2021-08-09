@@ -18,8 +18,6 @@ import (
 // PortForward connects to a Pod and tunnels traffic from a local port to this pod.
 func PortForward(namespace, podName string, fromPort, toPort int) error {
 
-	fmt.Printf("PortForward %s/%s (%d:%d)\n", namespace, podName, fromPort, toPort)
-
 	// CONFIG
 	var config *rest.Config
 
