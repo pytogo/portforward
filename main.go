@@ -28,7 +28,12 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var pod string = C.GoString(podName)
 
 	if err := internal_portforward.ForwardByHome(ns, pod, int(fromPort), int(toPort)); err != nil {
-		panic(err)
+
+		msg := fmt.Sprintf("%s", err)
+
+		C.PyErr_SetString(C.PyExc_RuntimeError, msg)
+
+		return nil
 	}
 
 	C.Py_IncRef(C.Py_None)
