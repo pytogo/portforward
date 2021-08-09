@@ -24,7 +24,7 @@ static struct PyMethodDef methods[] = {
 
 static struct PyModuleDef module = {
     PyModuleDef_HEAD_INIT,
-    "portforward",
+    "portforward._internal",
     "Kubernetes Port-Forward Go-Edition For Python",
     -1,
     methods
