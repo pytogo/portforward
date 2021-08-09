@@ -46,7 +46,7 @@ setup(
     build_golang={'root': 'github.com/pytogo/portforward'},
     ext_modules=[
         Extension(
-            "portforward._internal", ["main.go"],
+            "_portforward", ["main.go"],
             py_limited_api=True, define_macros=[('Py_LIMITED_API', None)],
         )
     ]

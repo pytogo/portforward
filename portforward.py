@@ -2,7 +2,7 @@
 Kubernetes Port-Forward Go-Edition For Python
 """
 
-from . import _internal
+import _portforward
 
 
 def forward_by_home(namespace: str, pod: str, from_port: int, to_port: int) -> None:
@@ -23,7 +23,7 @@ def forward_by_home(namespace: str, pod: str, from_port: int, to_port: int) -> N
     _validate_port("from_port", from_port)
     _validate_port("to_port", to_port)
 
-    _internal.forward_by_home(namespace, pod, from_port, to_port)
+    _portforward.forward_by_home(namespace, pod, from_port, to_port)
 
 
 # ===== PRIVATE =====
