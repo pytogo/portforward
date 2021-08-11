@@ -50,5 +50,5 @@ PyMODINIT_FUNC PyInit__portforward(void) {
 // ===== END PYTHON PART =====
 
 void raise_exception(char *msg) {
-    PyErr_SetString(PortforwardError, msg)
+    PyErr_SetString(PortforwardError, msg);
 }
