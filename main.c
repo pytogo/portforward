@@ -1,5 +1,7 @@
 #include <Python.h>
 
+// ===== START PYTHON PART =====
+
 /* Will come from go */
 PyObject* forward(PyObject* , PyObject*);
 
@@ -30,6 +32,23 @@ static struct PyModuleDef module = {
     methods
 };
 
+static PyObject *PortforwardError = NULL;
+
 PyMODINIT_FUNC PyInit__portforward(void) {
-    return PyModule_Create(&module);
+    /* Assign module value */
+    PyObject *module = PyModule_Create(&module);
+
+    /* Initialize new exception object */
+    StringTooShortError = PyErr_NewException("_portforward.PortforwardError", PyExc_RuntimeError, NULL);
+
+    /* Add exception object to your module */
+    PyModule_AddObject(module, "PortforwardError", PortforwardError);
+
+    return module;
+}
+
+// ===== END PYTHON PART =====
+
+void raise_exception(char *msg) {
+    PyErr_SetString(PortforwardError, msg)
 }
