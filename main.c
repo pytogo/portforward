@@ -39,7 +39,7 @@ PyMODINIT_FUNC PyInit__portforward(void) {
     PyObject *module = PyModule_Create(&module);
 
     /* Initialize new exception object */
-    StringTooShortError = PyErr_NewException("_portforward.PortforwardError", PyExc_RuntimeError, NULL);
+    PortforwardError = PyErr_NewException("_portforward.PortforwardError", PyExc_RuntimeError, NULL);
 
     /* Add exception object to your module */
     PyModule_AddObject(module, "PortforwardError", PortforwardError);
