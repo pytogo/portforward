@@ -35,14 +35,26 @@ static struct PyModuleDef module = {
 static PyObject *PortforwardError = NULL;
 
 PyMODINIT_FUNC PyInit__portforward(void) {
+    PyObject *m;
+
+    m = PyModule_Create(&module);
+    if (m == NULL)
+        return NULL;
 
     /* Initialize new exception object */
-    PortforwardError = PyErr_NewException("_portforward.PortforwardError", PyExc_RuntimeError, NULL);
+    // Base class: NULL = Exception
+    PortforwardError = PyErr_NewException("_portforward.PortforwardError", NULL, NULL);
+    Py_XINCREF(PortforwardError);
 
     /* Add exception object to your module */
-    PyModule_AddObject(&module, "PortforwardError", PortforwardError);
+    if (PyModule_AddObject(m, "error", PortforwardError) < 0) {
+        Py_XDECREF(PortforwardError);
+        Py_CLEAR(PortforwardError);
+        Py_DECREF(m);
+        return NULL;
+    }
 
-    return PyModule_Create(&module);
+    return m;
 }
 
 // ===== END PYTHON PART =====
