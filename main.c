@@ -16,7 +16,7 @@ int PyArg_ParseTuple_ssll(PyObject* args, char** a, char** b, int* c, int* d) {
 
 static struct PyMethodDef methods[] = {
     {
-    "forward_by_home",
+    "forward",
     (PyCFunction)forward,
     METH_VARARGS,
     "Connects to a Pod and tunnels traffic from a local port to this pod. It uses the kubectl kube config from the home dir."

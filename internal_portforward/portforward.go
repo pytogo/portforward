@@ -18,8 +18,8 @@ import (
 	"syscall"
 )
 
-// ForwardByHome connects to a Pod and tunnels traffic from a local port to this pod.
-func ForwardByHome(namespace, podName string, fromPort, toPort int) error {
+// Forward connects to a Pod and tunnels traffic from a local port to this pod.
+func Forward(namespace, podName string, fromPort, toPort int) error {
 
 	// CONFIG
 	var config *rest.Config
