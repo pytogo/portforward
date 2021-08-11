@@ -11,8 +11,11 @@ import (
 	"k8s.io/client-go/util/homedir"
 	"net/http"
 	"net/url"
+	"os"
+	"os/signal"
 	"path/filepath"
 	"strings"
+	"syscall"
 )
 
 // ForwardByHome connects to a Pod and tunnels traffic from a local port to this pod.
@@ -38,6 +41,8 @@ func ForwardByHome(namespace, podName string, fromPort, toPort int) error {
 
 	// PORT FORWARD
 	stopChan, readyChan := make(chan struct{}, 1), make(chan struct{}, 1)
+	closeOnSigterm(stopChan)
+
 	ports := fmt.Sprintf("%d:%d", fromPort, toPort)
 
 	if err := startForward(dialer, ports, stopChan, readyChan); err != nil {
@@ -108,4 +113,16 @@ func startForward(dialer httpstream.Dialer, ports string, stopChan, readyChan ch
 	}
 
 	return nil
+}
+
+// closeOnSigterm cares about closing a channel when the OS sends a SIGTERM.
+func closeOnSigterm(stopCh chan struct{}) {
+	sigs := make(chan os.Signal, 1)
+
+	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
+
+	go func() {
+		<-sigs
+		close(stopCh)
+	}()
 }
