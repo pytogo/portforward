@@ -35,7 +35,8 @@ def forward_by_home(namespace: str, pod: str, from_port: int, to_port: int) -> N
     try:
         _portforward.forward_by_home(namespace, pod, from_port, to_port)
     except RuntimeError as err:
-        raise PortforwardError(err)
+        # Suppress extension exception
+        raise PortforwardError(err) from None
 
 
 # ===== PRIVATE =====
