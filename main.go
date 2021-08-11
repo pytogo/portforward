@@ -32,7 +32,6 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 
 		msg := fmt.Sprintf("%s", err)
 
-		// C.PyErr_SetString(C.PyExc_RuntimeError, C.CString(msg))
 		C.raise_exception(C.CString(msg))
 
 		return nil

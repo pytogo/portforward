@@ -42,8 +42,7 @@ PyMODINIT_FUNC PyInit__portforward(void) {
         return NULL;
 
     /* Initialize new exception object */
-    // Base class: NULL = Exception
-    PortforwardError = PyErr_NewException("_portforward.PortforwardError", NULL, NULL);
+    PortforwardError = PyErr_NewException("_portforward.PortforwardError", PyExc_RuntimeError, NULL);
     Py_XINCREF(PortforwardError);
 
     /* Add exception object to your module */
