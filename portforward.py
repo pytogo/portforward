@@ -1,6 +1,7 @@
 """
 Kubernetes Port-Forward Go-Edition For Python
 """
+import contextlib
 
 import _portforward
 
@@ -9,15 +10,18 @@ class PortforwardError(Exception):
     """ Will be raised when something went wrong while the port-forward process. """
 
 
+@contextlib.contextmanager
 def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
-    It uses the kubectl kube config from the home dir. The portforward will
-    be closed by SIGTERM.
+    It uses the kubectl kube config from the home dir.
+
+    (Best consumed has context manager.)
 
     Example:
         >>> import portforward
-        >>> portforward.forward("test", "web", 9000, 80)
+        >>> with portforward.forward("test", "web", 9000, 80):
+        >>>     # Do work
 
     :param namespace: Target namespace
     :param pod: Name of target Pod
@@ -34,9 +38,14 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
 
     try:
         _portforward.forward(namespace, pod, from_port, to_port)
+        yield None
+
     except RuntimeError as err:
         # Suppress extension exception
         raise PortforwardError(err) from None
+
+    finally:
+        _portforward.stop(namespace, pod)
 
 
 # ===== PRIVATE =====
@@ -45,8 +54,12 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
 def _validate_str(arg_name, arg):
     if arg is None or not isinstance(arg, str):
         raise ValueError(f"{arg_name}={arg} is not a valid str")
+
     if len(arg) == 0:
         raise ValueError(f"{arg_name} cannot be an empty str")
+
+    if "/" in arg:
+        raise ValueError(f"{arg_name} contains illegal character '/'")
 
 
 def _validate_port(arg_name, arg):

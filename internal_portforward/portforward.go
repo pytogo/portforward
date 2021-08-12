@@ -15,8 +15,54 @@ import (
 	"os/signal"
 	"path/filepath"
 	"strings"
+	"sync"
 	"syscall"
 )
+
+// ===== Management of open connections =====
+
+/*
+Thoughts:
+
+Global states are bad but should any reference to memory exists in
+the Python and Go space? Who should when free the memory?
+
+Every space should keep the ownership of its memory allocations.
+Parameters are passed from Python to Go but Go never owns them.
+*/
+var (
+	activeForwards = make(map[string]chan struct{})
+	mutex          sync.Mutex
+)
+
+// registerForwarding adds a forwarding to the active forwards.
+func registerForwarding(namespace, pod string, stopCh chan struct{}) {
+	key := fmt.Sprintf("%s/%s", namespace, pod)
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if otherCh, ok := activeForwards[key]; ok {
+		close(otherCh)
+	}
+
+	activeForwards[key] = stopCh
+}
+
+// StopForwarding closes a port forwarding.
+func StopForwarding(namespace, pod string) {
+	key := fmt.Sprintf("%s/%s", namespace, pod)
+
+	mutex.Lock()
+	defer mutex.Unlock()
+
+	if otherCh, ok := activeForwards[key]; ok {
+		close(otherCh)
+		delete(activeForwards, key)
+	}
+}
+
+// ===== Port forwarding =====
 
 // Forward connects to a Pod and tunnels traffic from a local port to this pod.
 func Forward(namespace, podName string, fromPort, toPort int) error {
@@ -41,13 +87,16 @@ func Forward(namespace, podName string, fromPort, toPort int) error {
 
 	// PORT FORWARD
 	stopChan, readyChan := make(chan struct{}, 1), make(chan struct{}, 1)
-	closeOnSigterm(stopChan)
 
 	ports := fmt.Sprintf("%d:%d", fromPort, toPort)
 
 	if err := startForward(dialer, ports, stopChan, readyChan); err != nil {
 		return err
 	}
+
+	// HANDLE CLOSING
+	registerForwarding(namespace, podName, stopChan)
+	closeOnSigterm(namespace, podName)
 
 	return nil
 }
@@ -108,21 +157,25 @@ func startForward(dialer httpstream.Dialer, ports string, stopChan, readyChan ch
 	}()
 
 	// Locks until stopChan is closed.
-	if err = forwarder.ForwardPorts(); err != nil {
-		return err
-	}
+	go func() {
+		if err = forwarder.ForwardPorts(); err != nil {
+			panic(err)
+		}
+	}()
 
 	return nil
 }
 
 // closeOnSigterm cares about closing a channel when the OS sends a SIGTERM.
-func closeOnSigterm(stopCh chan struct{}) {
+func closeOnSigterm(namespace, podName string) {
 	sigs := make(chan os.Signal, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
 
 	go func() {
+		// Received kill signal
 		<-sigs
-		close(stopCh)
+
+		StopForwarding(namespace, podName)
 	}()
 }

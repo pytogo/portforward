@@ -4,6 +4,7 @@
 
 /* Will come from go */
 PyObject* forward(PyObject* , PyObject*);
+PyObject* stop(PyObject* , PyObject*);
 
 /*
 To shim go's missing variadic function support.
@@ -14,12 +15,22 @@ int PyArg_ParseTuple_ssll(PyObject* args, char** a, char** b, int* c, int* d) {
     return PyArg_ParseTuple(args, "ssii", a, b, c, d);
 }
 
+int PyArg_ParseTuple_ss(PyObject* args, char** a, char** b) {
+    return PyArg_ParseTuple(args, "ss", a, b);
+}
+
 static struct PyMethodDef methods[] = {
     {
     "forward",
     (PyCFunction)forward,
     METH_VARARGS,
     "Connects to a Pod and tunnels traffic from a local port to this pod. It uses the kubectl kube config from the home dir."
+    },
+    {
+    "stop",
+    (PyCFunction)stop,
+    METH_VARARGS,
+    "Stops a port-forwarding."
     },
     {NULL, NULL, 0, NULL}
 };
