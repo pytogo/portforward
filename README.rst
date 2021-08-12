@@ -26,6 +26,13 @@ Features
 * Go native Kubernetes port-forwarding with the ``.kube/config`` from the home dir.
 
 
+Open question / ToDo's
+-------------
+
+* Add testing
+* Is there any missing memory deallocation?
+
+
 How it works
 ------------
 
