@@ -2,8 +2,11 @@ package internal_portforward
 
 import (
 	"bytes"
+	"context"
 	"fmt"
+	metav1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/apimachinery/pkg/util/httpstream"
+	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/rest"
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/portforward"
@@ -74,6 +77,13 @@ func Forward(namespace, podName string, fromPort, toPort int, configPath string)
 		config = c
 	}
 
+	// CHECK
+	// PortForward must be started in a go-routine, therefore we have
+	// to check manually if the pod exists and is reachable.
+	if err := checkPodExistence(config, namespace, podName); err != nil {
+		return err
+	}
+
 	// DIALER
 	var dialer httpstream.Dialer
 
@@ -109,6 +119,20 @@ func loadConfig(configPath string) (*rest.Config, error) {
 	}
 
 	return config, nil
+}
+
+func checkPodExistence(config *rest.Config, namespace, podName string) error {
+	clientset, err := kubernetes.NewForConfig(config)
+	if err != nil {
+		return err
+	}
+
+	_, err = clientset.CoreV1().Pods(namespace).Get(context.Background(), podName, metav1.GetOptions{})
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 // newDialer creates a dialer that connects to the pod.
