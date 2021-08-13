@@ -8,12 +8,10 @@ import (
 	"k8s.io/client-go/tools/clientcmd"
 	"k8s.io/client-go/tools/portforward"
 	"k8s.io/client-go/transport/spdy"
-	"k8s.io/client-go/util/homedir"
 	"net/http"
 	"net/url"
 	"os"
 	"os/signal"
-	"path/filepath"
 	"strings"
 	"sync"
 	"syscall"
@@ -65,12 +63,12 @@ func StopForwarding(namespace, pod string) {
 // ===== Port forwarding =====
 
 // Forward connects to a Pod and tunnels traffic from a local port to this pod.
-func Forward(namespace, podName string, fromPort, toPort int) error {
+func Forward(namespace, podName string, fromPort, toPort int, configPath string) error {
 
 	// CONFIG
 	var config *rest.Config
 
-	if c, err := configFromHome(); err != nil {
+	if c, err := loadConfig(configPath); err != nil {
 		return err
 	} else {
 		config = c
@@ -103,13 +101,8 @@ func Forward(namespace, podName string, fromPort, toPort int) error {
 
 // Based on example https://github.com/kubernetes/client-go/issues/51#issuecomment-436200428
 
-// configFromHome fetches the config from .kube config folder inside the home dir.
-func configFromHome() (*rest.Config, error) {
-	var configPath string
-	if home := homedir.HomeDir(); home != "" {
-		configPath = filepath.Join(home, ".kube", "config")
-	}
-
+// loadConfig fetches the config from .kube config folder inside the home dir.
+func loadConfig(configPath string) (*rest.Config, error) {
 	config, err := clientcmd.BuildConfigFromFlags("", configPath)
 	if err != nil {
 		return nil, err

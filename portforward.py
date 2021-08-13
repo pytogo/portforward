@@ -2,6 +2,7 @@
 Kubernetes Port-Forward Go-Edition For Python
 """
 import contextlib
+from pathlib import PurePath, Path
 
 import _portforward
 
@@ -11,7 +12,7 @@ class PortforwardError(Exception):
 
 
 @contextlib.contextmanager
-def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
+def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path: str = None) -> None:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
     It uses the kubectl kube config from the home dir.
@@ -27,6 +28,7 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
     :param pod: Name of target Pod
     :param from_port: Local port
     :param to_port: Port inside the pod
+    :param config_path: If none is provided, will be loaded from $HOME/.kube/config
     :return: None
     """
 
@@ -36,8 +38,10 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int) -> None:
     _validate_port("from_port", from_port)
     _validate_port("to_port", to_port)
 
+    config_path = _config_path(config_path)
+
     try:
-        _portforward.forward(namespace, pod, from_port, to_port)
+        _portforward.forward(namespace, pod, from_port, to_port, config_path)
         yield None
 
     except RuntimeError as err:
@@ -66,3 +70,13 @@ def _validate_port(arg_name, arg):
     in_range = 0 < arg < 65536
     if arg is None or not isinstance(arg, int) or not in_range:
         raise ValueError(f"{arg_name}={arg} is not a valid port")
+
+
+def _config_path(config_path_arg):
+    if config_path_arg and not isinstance(config_path_arg, str):
+        raise ValueError(f"config_path={config_path_arg} is not a valid str")
+
+    elif config_path_arg:
+        return config_path_arg
+
+    return str(Path.home() / ".kube" / "config")
