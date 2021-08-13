@@ -44,8 +44,8 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path:
     try:
         _portforward.forward(namespace, pod, from_port, to_port, config_path)
 
-        # Go needs some ms to be ready
-        time.sleep(0.01)
+        # Go and the port-forwarding needs some ms to be ready
+        time.sleep(0.1)
 
         yield None
 
