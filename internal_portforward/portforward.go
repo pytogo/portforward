@@ -67,6 +67,7 @@ func StopForwarding(namespace, pod string) {
 
 // Forward connects to a Pod and tunnels traffic from a local port to this pod.
 func Forward(namespace, podName string, fromPort, toPort int, configPath string) error {
+	// Based on example https://github.com/kubernetes/client-go/issues/51#issuecomment-436200428
 
 	// CONFIG
 	var config *rest.Config
@@ -108,8 +109,6 @@ func Forward(namespace, podName string, fromPort, toPort int, configPath string)
 
 	return nil
 }
-
-// Based on example https://github.com/kubernetes/client-go/issues/51#issuecomment-436200428
 
 // loadConfig fetches the config from .kube config folder inside the home dir.
 func loadConfig(configPath string) (*rest.Config, error) {
