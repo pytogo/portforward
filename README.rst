@@ -29,8 +29,9 @@ Features
 Open question / ToDo's
 -------------
 
-* Add testing
+* Add tests
 * Is there any missing memory deallocation?
+* Automate building and releasing
 
 
 How it works
