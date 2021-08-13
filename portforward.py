@@ -15,9 +15,9 @@ class PortforwardError(Exception):
 def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path: str = None) -> None:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
-    It uses the kubectl kube config from the home dir.
+    It uses the kubectl kube config from the home dir if no path is provided.
 
-    (Best consumed has context manager.)
+    (Best consumed as context manager.)
 
     Example:
         >>> import portforward
@@ -28,7 +28,7 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path:
     :param pod: Name of target Pod
     :param from_port: Local port
     :param to_port: Port inside the pod
-    :param config_path: If none is provided, will be loaded from $HOME/.kube/config
+    :param config_path: Path for loading kube config
     :return: None
     """
 
