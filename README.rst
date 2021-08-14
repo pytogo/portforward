@@ -31,8 +31,13 @@ Quickstart
 
 
     def main():
+        namespace = "test"
+        pod_name = "web"
+        local_port = 9000  # from port
+        pod_port = 80  # to port
+
         # No path to kube config provided - will use default from $HOME/.kube/config
-        with portforward.forward("test", "web", 9000, 80):
+        with portforward.forward(namespace, pod_name, local_port, pod_port):
             response = requests.get("http://localhost:9000")
             print(f"Done: \n'{response.status_code}'\n'{response.text[:20]}...'")
 
