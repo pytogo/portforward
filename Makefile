@@ -92,6 +92,7 @@ release-test-linux: ## package and upload a release to test.pypi
 
 release-linux: ## package and upload a release for linux
 	setuptools-golang-build-manylinux-wheels --golang 1.16.6
+	python setup.py sdist
 	twine upload dist/*
 
 # ===== WINDOWS =====
