@@ -72,7 +72,7 @@ def _validate_str(arg_name, arg):
 
 
 def _validate_port(arg_name, arg):
-    in_range = 0 < arg < 65536
+    in_range = arg and 0 < arg < 65536
     if arg is None or not isinstance(arg, int) or not in_range:
         raise ValueError(f"{arg_name}={arg} is not a valid port")
 
