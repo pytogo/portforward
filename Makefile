@@ -62,6 +62,9 @@ coverage: ## check code coverage quickly with the default Python
 	coverage html
 	$(BROWSER) htmlcov/index.html
 
+docs-check:
+	python setup.py check -r -s
+
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/portforward.rst
 	rm -f docs/modules.rst
@@ -84,6 +87,7 @@ install: clean ## install the package to the active Python's site-packages
 # ===== LINUX =====
 release-test-linux: ## package and upload a release to test.pypi
 	setuptools-golang-build-manylinux-wheels --golang 1.16.6
+	python setup.py sdist
 	twine upload --repository testpypi dist/*
 
 release-linux: ## package and upload a release for linux

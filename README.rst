@@ -27,7 +27,7 @@ Features
 
 
 Open question / ToDo's
--------------
+----------------------
 
 * Add tests
 * Is there any missing memory deallocation?
