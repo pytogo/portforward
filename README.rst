@@ -20,22 +20,49 @@ Kubernetes Port-Forward Go-Edition For Python
 * Documentation: https://portforward.readthedocs.io.
 
 
+Quickstart
+----------
+
+.. code-block:: Python
+
+    import requests
+
+    import portforward
+
+
+    def main():
+        # No path to kube config provided - will use default from $HOME/.kube/config
+        with portforward.forward("test", "web", 9000, 80):
+            response = requests.get("http://localhost:9000")
+            print(f"Done: \n'{response.status_code}'\n'{response.text[:20]}...'")
+
+
+    if __name__ == "__main__":
+        main()
+
+
 Features
 --------
 
-* Go native Kubernetes port-forwarding with the ``.kube/config`` from the home dir.
+* Go native Kubernetes port-forwarding with the ``.kube/config`` from the home dir
+  or any other path to config.
 
 
 Open question / ToDo's
 ----------------------
 
 * Add tests
-* Is there any missing memory deallocation?
+* Check need of memory deallocation
 * Automate building and releasing
 
 
-How it works
-------------
+Development
+-----------
+
+External requirements of this project:
+
+* Golang
+* gcc
 
 This project uses setuptools-golang_. It will be install through ``pip`` with
 the requirements-dev.txt. The following additional lines in the ``setup.py``
