@@ -59,6 +59,28 @@ Get Started!
 
 Ready to contribute? Here's how to set up `portforward` for local development.
 
+
+External requirements of this project:
+
+* Golang
+* gcc
+
+This project uses setuptools-golang_. It will be install through ``pip`` with
+the requirements-dev.txt. The following additional lines in the ``setup.py``
+activates the compiling:
+
+.. _setuptools-golang: https://github.com/asottile/setuptools-golang
+
+.. code-block:: Python
+
+    ext_modules=[
+        Extension(
+            "portforward", ["main.go"],
+            py_limited_api=True, define_macros=[('Py_LIMITED_API', None)],
+        )
+    ]
+
+
 1. Fork the `portforward` repo on GitHub.
 2. Clone your fork locally::
 
@@ -124,5 +146,3 @@ Then run::
 $ bump2version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
-
-Travis will then deploy to PyPI if tests pass.

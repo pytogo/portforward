@@ -61,28 +61,6 @@ Open question / ToDo's
 * Automate building and releasing
 
 
-Development
------------
-
-External requirements of this project:
-
-* Golang
-* gcc
-
-This project uses setuptools-golang_. It will be install through ``pip`` with
-the requirements-dev.txt. The following additional lines in the ``setup.py``
-activates the compiling:
-
-.. code-block:: Python
-
-    ext_modules=[
-        Extension(
-            "portforward", ["main.go"],
-            py_limited_api=True, define_macros=[('Py_LIMITED_API', None)],
-        )
-    ]
-
-
 Credits
 -------
 
