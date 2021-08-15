@@ -6,6 +6,9 @@ portforward
 .. image:: https://img.shields.io/pypi/v/portforward.svg
         :target: https://pypi.python.org/pypi/portforward
 
+.. image:: https://img.shields.io/pypi/status/portforward.svg
+        :target: https://pypi.python.org/pypi/portforward
+
 .. image:: https://readthedocs.org/projects/portforward/badge/?version=latest
         :target: https://portforward.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
