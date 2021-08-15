@@ -23,10 +23,14 @@ import shutil
 sys.path.insert(0, os.path.abspath('..'))
 
 # readthedocs cannot built the extension therefore we reuse the pyi.
-shutil.move(os.path.join("..", "_portforward.pyi"), os.path.join("..", "_portforward.py"))
-
+if os.path.exists("_portforward.pyi"):
+    shutil.move("_portforward.pyi", "_portforward.py")
 
 import portforward
+
+# readthedocs cannot built the extension therefore we reuse the pyi.
+if os.path.exists("_portforward.py"):
+    shutil.move("_portforward.py", "_portforward.pyi")
 
 # -- General configuration ---------------------------------------------
 
