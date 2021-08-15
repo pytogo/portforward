@@ -1,0 +1,6 @@
+version: 2
+
+build:
+    apt_packages:
+        - golang-go
+        - gcc
