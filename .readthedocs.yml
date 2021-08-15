@@ -18,5 +18,5 @@ python:
 
 build:
     apt_packages:
-        - golang-go
+        - golang-1.16
         - gcc
