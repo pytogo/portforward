@@ -104,7 +104,15 @@ release-windows: dist ## package and upload a release for Linux
 
 # ===== MACOS =====
 release-test-macos: dist ## package and upload a release to test.pypi
+	python3.9 setup.py bdist_wheel
+	python3.8 setup.py bdist_wheel
+	python3.7 setup.py bdist_wheel
+	python3.6 setup.py bdist_wheel
 	twine upload --repository testpypi dist/*
 
 release-macos: dist ## package and upload a release for MacOS
+	python3.9 setup.py bdist_wheel
+	python3.8 setup.py bdist_wheel
+	python3.7 setup.py bdist_wheel
+	python3.6 setup.py bdist_wheel
 	twine upload dist/*
