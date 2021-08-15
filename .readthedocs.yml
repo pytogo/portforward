@@ -14,7 +14,7 @@ python:
     install:
         - requirements: requirements-dev.txt
         - method: setuptools
-          path: portforward
+          path: .
 
 build:
     apt_packages:
