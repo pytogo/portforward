@@ -19,7 +19,12 @@
 #
 import os
 import sys
+import shutil
 sys.path.insert(0, os.path.abspath('..'))
+
+# readthedocs cannot built the extension therefore we reuse the pyi.
+shutil.move(os.path.join("..", "_portforward.pyi"), os.path.join("..", "_portforward.py"))
+
 
 import portforward
 
