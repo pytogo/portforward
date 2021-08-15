@@ -1,9 +1,12 @@
 """
 Kubernetes Port-Forward Go-Edition For Python
 """
+
+__version__ = "0.2.0"
+
 import contextlib
 import time
-from pathlib import PurePath, Path
+from pathlib import Path
 
 import _portforward
 
