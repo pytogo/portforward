@@ -56,14 +56,6 @@ Features
   or any other path to config.
 
 
-Open question / ToDo's
-----------------------
-
-* Add tests
-* Check need of memory deallocation
-* Automate building and releasing
-
-
 Credits
 -------
 

@@ -12,6 +12,13 @@ You can contribute in many ways:
 Types of Contributions
 ----------------------
 
+Open question / ToDo's
+~~~~~~~~~~~~~~~~~~~~~~
+
+* Add tests
+* Check need of memory deallocation
+* Automate building and releasing
+
 Report Bugs
 ~~~~~~~~~~~
 
