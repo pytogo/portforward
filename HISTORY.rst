@@ -5,7 +5,7 @@ History
 0.2.0 (2021-08-14)
 ------------------
 
-* Release on Test PyPI.
+* First Release on PyPI.
 * Made path to kube config variable.
 * Port-forwarding became non-blocking.
 * Fixed verification bug when port was None.
