@@ -7,7 +7,6 @@ Welcome to portforward's documentation!
 
    readme
    installation
-   usage
    modules
    contributing
    authors

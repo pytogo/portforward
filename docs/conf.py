@@ -19,9 +19,22 @@
 #
 import os
 import sys
+import shutil
 sys.path.insert(0, os.path.abspath('..'))
 
+# for readthedocs - APT offers only golang 1.10 :( - readthedocs uses Ubuntu 18.04.
+# TODO remove this, when RTD updates its build server
+pyi = os.path.abspath(os.path.join('..', '_portforward.pyi'))
+py = os.path.abspath(os.path.join('..', '_portforward.py'))
+
+if os.path.exists(pyi):
+    shutil.move(pyi, py)
+
 import portforward
+
+# for readthedocs
+if os.path.exists(py):
+    shutil.move(py, pyi)
 
 # -- General configuration ---------------------------------------------
 
