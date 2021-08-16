@@ -13,10 +13,3 @@ python:
     version: "3.8"
     install:
         - requirements: requirements-dev.txt
-        - method: setuptools
-          path: .
-
-build:
-    apt_packages:
-        - golang-1.13-go
-        - gcc
