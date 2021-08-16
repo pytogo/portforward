@@ -76,11 +76,6 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-dist: clean ## builds source and wheel package
-	python setup.py sdist
-	python setup.py bdist_wheel
-	ls -l dist
-
 install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
@@ -96,11 +91,19 @@ release-linux: ## package and upload a release for linux
 	twine upload dist/*
 
 # ===== WINDOWS =====
-release-test-windows: dist ## package and upload a release to test.pypi
-	twine upload --repository testpypi dist/*
+release-test-windows: ## package and upload a release to test.pypi
+	python39 setup.py bdist_wheel
+	python38 setup.py bdist_wheel
+	python37 setup.py bdist_wheel
+	python36 setup.py bdist_wheel
+	twine upload --repository testpypi dist\*
 
-release-windows: dist ## package and upload a release for Linux
-	twine upload dist/*
+release-windows: ## package and upload a release for Linux
+	python39 setup.py bdist_wheel
+	python38 setup.py bdist_wheel
+	python37 setup.py bdist_wheel
+	python36 setup.py bdist_wheel
+	twine upload dist\*
 
 # ===== MACOS =====
 release-test-macos: ## package and upload a release to test.pypi
