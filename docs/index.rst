@@ -1,11 +1,12 @@
 Welcome to portforward's documentation!
 ======================================
 
+.. include:: ../README.rst
+
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :hidden:
 
-   readme
    installation
    modules
    contributing

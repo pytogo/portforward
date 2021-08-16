@@ -28,6 +28,11 @@ From sources
 
 The sources for portforward can be downloaded from the `Github repo`_.
 
+External requirements of this project:
+
+* Golang
+* gcc
+
 You can either clone the public repository:
 
 .. code-block:: console
@@ -40,7 +45,7 @@ Or download the `tarball`_:
 
     $ curl -OJL https://github.com/pytogo/portforward/tarball/master
 
-Once you have a copy of the source, you can install it with:
+Once you have a copy of the source and the external dependencies ready, you can install it with:
 
 .. code-block:: console
 
