@@ -12,6 +12,10 @@ import (
 //export forward
 func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	// Interface for C extension and only part that contains C.
+
+	// Strings should not need to be freed
+	// > A pointer to an existing string is stored in the character pointer variable whose address you pass.
+	// https://docs.python.org/3/c-api/arg.html
 	var namespace *C.char
 	var podName *C.char
 
@@ -42,6 +46,10 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 //export stop
 func stop(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	// Interface for C extension and only part that contains C.
+
+	// Strings should not need to be freed
+	// > A pointer to an existing string is stored in the character pointer variable whose address you pass.
+	// https://docs.python.org/3/c-api/arg.html
 	var namespace *C.char
 	var podName *C.char
 
