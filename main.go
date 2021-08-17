@@ -1,7 +1,7 @@
 package main
 
 // #include <Python.h>
-// int PyArg_ParseTuple_sslls(PyObject* args, char** a, char** b, int* c, int* d, char** e);
+// int PyArg_ParseTuple_ssiis(PyObject* args, char** a, char** b, int* c, int* d, char** e);
 // int PyArg_ParseTuple_ss(PyObject*, char**, char**);
 // void raise_exception(char *msg);
 import "C"
@@ -20,7 +20,7 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 
 	var configPath *C.char
 
-	if C.PyArg_ParseTuple_sslls(args, &namespace, &podName, &fromPort, &toPort, &configPath) == 0 {
+	if C.PyArg_ParseTuple_ssiis(args, &namespace, &podName, &fromPort, &toPort, &configPath) == 0 {
 		C.raise_exception(C.CString("Could not parse args"))
 		return nil
 	}

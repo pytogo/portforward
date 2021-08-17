@@ -11,7 +11,7 @@ To shim go's missing variadic function support.
 
 Ref https://docs.python.org/3/c-api/arg.html
 */
-int PyArg_ParseTuple_sslls(PyObject* args, char** a, char** b, int* c, int* d, char** e) {
+int PyArg_ParseTuple_ssiis(PyObject* args, char** a, char** b, int* c, int* d, char** e) {
     return PyArg_ParseTuple(args, "ssiis", a, b, c, d, e);
 }
 
