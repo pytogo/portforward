@@ -80,25 +80,25 @@ install: clean ## install the package to the active Python's site-packages
 	python setup.py install
 
 # ===== LINUX =====
-release-test-linux: ## package and upload a release to test.pypi
+release-test-linux: clean ## package and upload a release to test.pypi
 	setuptools-golang-build-manylinux-wheels --golang 1.16.6
 	python setup.py sdist
 	twine upload --repository testpypi dist/*
 
-release-linux: ## package and upload a release for linux
+release-linux: clean ## package and upload a release for linux
 	setuptools-golang-build-manylinux-wheels --golang 1.16.6
 	python setup.py sdist
 	twine upload dist/*
 
 # ===== WINDOWS =====
-release-test-windows: ## package and upload a release to test.pypi
+release-test-windows: clean ## package and upload a release to test.pypi
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
 	python37 setup.py bdist_wheel
 	python36 setup.py bdist_wheel
 	twine upload --repository testpypi dist\*
 
-release-windows: ## package and upload a release for Linux
+release-windows: clean ## package and upload a release for Linux
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
 	python37 setup.py bdist_wheel
@@ -106,14 +106,14 @@ release-windows: ## package and upload a release for Linux
 	python39 twine upload dist\*
 
 # ===== MACOS =====
-release-test-macos: ## package and upload a release to test.pypi
+release-test-macos: clean ## package and upload a release to test.pypi
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
 	python3.7 setup.py bdist_wheel
 	python3.6 setup.py bdist_wheel
 	python39 twine upload --repository testpypi dist/*
 
-release-macos: ## package and upload a release for MacOS
+release-macos: clean ## package and upload a release for MacOS
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
 	python3.7 setup.py bdist_wheel
