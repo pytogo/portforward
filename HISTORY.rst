@@ -2,6 +2,13 @@
 History
 =======
 
+
+0.2.1 (2021-08-19)
+------------------
+* Changed temporary setuptools-golang to pytogo's fork
+  for smaller binaries
+
+
 0.2.0 (2021-08-14)
 ------------------
 
