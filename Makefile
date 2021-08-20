@@ -91,19 +91,19 @@ release-linux: clean ## package and upload a release for linux
 	twine upload dist/*
 
 # ===== WINDOWS =====
-release-test-windows: clean ## package and upload a release to test.pypi
+release-test-windows: ## package and upload a release to test.pypi
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
 	python37 setup.py bdist_wheel
 	python36 setup.py bdist_wheel
-	twine upload --repository testpypi dist\*
+	python39 -m twine upload --repository testpypi dist\*
 
-release-windows: clean ## package and upload a release for Linux
+release-windows: ## package and upload a release for Linux
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
 	python37 setup.py bdist_wheel
 	python36 setup.py bdist_wheel
-	python39 twine upload dist\*
+	python39 -m twine upload dist\*
 
 # ===== MACOS =====
 release-test-macos: clean ## package and upload a release to test.pypi
@@ -111,11 +111,11 @@ release-test-macos: clean ## package and upload a release to test.pypi
 	python3.8 setup.py bdist_wheel
 	python3.7 setup.py bdist_wheel
 	python3.6 setup.py bdist_wheel
-	python39 twine upload --repository testpypi dist/*
+	python3.9 -m twine upload --repository testpypi dist/*
 
 release-macos: clean ## package and upload a release for MacOS
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
 	python3.7 setup.py bdist_wheel
 	python3.6 setup.py bdist_wheel
-	twine upload dist/*
+	python3.9 -m twine upload dist/*
