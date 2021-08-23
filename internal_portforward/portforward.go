@@ -143,6 +143,13 @@ func newDialer(config *rest.Config, namespace, podName string) (httpstream.Diale
 
 	path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward", namespace, podName)
 	hostIP := strings.TrimLeft(config.Host, "https://")
+
+	// When there is a "/" in the hostIP, it contains also a path
+	if parts := strings.SplitN(hostIP, "/", 1); len(parts) == 2 {
+		hostIP = parts[0]
+		path = fmt.Sprintf("/%s%s", parts[1], path)
+	}
+
 	serverURL := url.URL{Scheme: "https", Path: path, Host: hostIP}
 
 	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: roundTripper}, http.MethodPost, &serverURL)
