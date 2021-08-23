@@ -145,8 +145,6 @@ func newDialer(config *rest.Config, namespace, podName string) (httpstream.Diale
 	hostIP := strings.TrimLeft(config.Host, "https://")
 	serverURL := url.URL{Scheme: "https", Path: path, Host: hostIP}
 
-	fmt.Printf("hostIP: %s\n", hostIP)
-
 	dialer := spdy.NewDialer(upgrader, &http.Client{Transport: roundTripper}, http.MethodPost, &serverURL)
 
 	return dialer, nil
