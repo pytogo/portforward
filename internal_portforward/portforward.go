@@ -18,6 +18,9 @@ import (
 	"strings"
 	"sync"
 	"syscall"
+
+	// Auth plugins - common and cloud provider
+	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
 // ===== Management of open connections =====
