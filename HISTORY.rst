@@ -3,6 +3,13 @@ History
 =======
 
 
+0.2.4 (2021-08-23)
+------------------
+* Added adal import for Azure AD
+* Fixed host IPs with paths
+* Made timeout flexible
+
+
 0.2.3 (2021-08-23)
 ------------------
 * Fixed case when hostIP contains a path
