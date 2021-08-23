@@ -3,6 +3,12 @@ History
 =======
 
 
+0.2.3 (2021-08-23)
+------------------
+* Fixed case when hostIP contains a path
+* Added common and cloud provider auth plugins
+
+
 0.2.2 (2021-08-23)
 ------------------
 * Fixed missing module ``portforward``
