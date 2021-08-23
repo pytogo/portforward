@@ -20,6 +20,7 @@ import (
 	"syscall"
 
 	// Auth plugins - common and cloud provider
+	_ "github.com/Azure/go-autorest/autorest/adal"
 	_ "k8s.io/client-go/plugin/pkg/client/auth"
 )
 
