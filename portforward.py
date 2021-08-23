@@ -12,14 +12,24 @@ import _portforward
 
 
 class PortforwardError(Exception):
-    """ Will be raised when something went wrong while the port-forward process. """
+    """Will be raised when something went wrong while the port-forward process."""
 
 
 @contextlib.contextmanager
-def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path: str = None) -> None:
+def forward(
+    namespace: str,
+    pod: str,
+    from_port: int,
+    to_port: int,
+    config_path: str = None,
+    waiting: float = 0.1,
+) -> None:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
     It uses the kubectl kube config from the home dir if no path is provided.
+
+    Caution: Go and the port-forwarding needs some ms to be ready. ``waiting``
+    can be used to wait until the port-forward is ready.
 
     (Best consumed as context manager.)
 
@@ -33,6 +43,7 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path:
     :param from_port: Local port
     :param to_port: Port inside the pod
     :param config_path: Path for loading kube config
+    :param waiting: Delay in seconds
     :return: None
     """
 
@@ -48,7 +59,7 @@ def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path:
         _portforward.forward(namespace, pod, from_port, to_port, config_path)
 
         # Go and the port-forwarding needs some ms to be ready
-        time.sleep(0.1)
+        time.sleep(waiting)
 
         yield None
 
