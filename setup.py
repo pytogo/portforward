@@ -35,7 +35,7 @@ setup(
     include_package_data=True,
     keywords="portforward",
     name="portforward",
-    packages=find_packages(include=["portforward", "portforward.*"]),
+    py_modules=["portforward"],
     test_suite="tests",
     tests_require=test_requirements,
     url="https://github.com/pytogo/portforward",
