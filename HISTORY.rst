@@ -3,6 +3,11 @@ History
 =======
 
 
+0.2.5 (2021-09-09)
+------------------
+* Moved the actual portforward to own module
+
+
 0.2.4 (2021-08-23)
 ------------------
 * Added adal import for Azure AD
