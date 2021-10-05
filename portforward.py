@@ -23,7 +23,7 @@ def forward(
     to_port: int,
     config_path: str = None,
     waiting: float = 0.1,
-) -> None:
+) -> Generator[None, None, None]:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
     It uses the kubectl kube config from the home dir if no path is provided.
