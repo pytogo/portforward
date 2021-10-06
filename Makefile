@@ -48,7 +48,8 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 lint: ## check style with flake8
-	flake8 portforward tests
+	flake8 portforward.py --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 portforward.py --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
 test: ## run tests quickly with the default Python
 	pytest
