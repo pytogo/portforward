@@ -92,7 +92,7 @@ def _validate_port(arg_name, arg):
         raise ValueError(f"{arg_name}={arg} is not a valid port")
 
 
-def _config_path(config_path_arg):
+def _config_path(config_path_arg) -> str:
     if config_path_arg and not isinstance(config_path_arg, str):
         raise ValueError(f"config_path={config_path_arg} is not a valid str")
 
