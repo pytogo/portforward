@@ -6,6 +6,7 @@ __version__ = "0.2.6"
 
 import contextlib
 import time
+from typing import Generator
 from pathlib import Path
 
 import _portforward
