@@ -3,6 +3,17 @@ History
 =======
 
 
+0.2.7 (2021-10-05)
+------------------
+* Added missing import
+* Added type hint
+
+
+0.2.6 (2021-10-05)
+------------------
+* Fixed type hint
+
+
 0.2.5 (2021-09-09)
 ------------------
 * Moved the actual portforward to own module
