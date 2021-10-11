@@ -54,7 +54,7 @@ check: ## check style with flake8 and black - also check types
 	flake8 portforward.py --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
 test: ## run tests quickly with the default Python
-	pytest
+	python3 -m pytest
 
 test-all: ## run tests on every Python version with tox
 	tox
