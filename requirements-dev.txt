@@ -10,4 +10,4 @@ twine==1.14.0
 
 pytest==6.2.4
 
-setuptools-golang==2.5.0
+setuptools-golang==2.7.0
