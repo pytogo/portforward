@@ -48,6 +48,8 @@ and architectures:
 
 **Requirements for installation from source**
 
+The following things are required when there is no wheel available for the target system.
+
 * `Go` installed and available in the path (at least v1.16 / https://go.dev)
 * `Python` (at least v3.6 - below was never tested but might work)
 * `gcc` (for Windows available via MinGW)
