@@ -26,6 +26,42 @@ Kubernetes Port-Forward Go-Edition For Python
 * Documentation: https://portforward.readthedocs.io.
 
 
+Installation
+-----------------------------
+
+Wheels are available for:
+
+* Windows
+* MacOS X
+* Linux
+
+with Python versions:
+
+* 3.6
+* 3.7
+* 3.8
+* 3.9
+* 3.10
+
+and architectures:
+
+* x84_64
+
+**Requirements for installation from source**
+
+The following things are required when there is no wheel available for the target system.
+
+* `Go` installed and available in the path (at least v1.16 / https://go.dev)
+* `Python` (at least v3.6 - below was never tested but might work)
+* `gcc` (for Windows available via MinGW)
+
+Pip knows how to install ``portforward``.
+
+.. code-block::
+
+    pip install portforward
+
+
 Quickstart
 ----------
 
