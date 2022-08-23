@@ -18,8 +18,8 @@ Reminder from docs about memory management when parsing arguments:
 > won’t have to release any memory yourself. The only
 > exceptions are es, es#, et and et#.
 */
-int PyArg_ParseTuple_ssiis(PyObject* args, char** a, char** b, int* c, int* d, char** e) {
-    return PyArg_ParseTuple(args, "ssiis", a, b, c, d, e);
+int PyArg_ParseTuple_ssiisp(PyObject* args, char** a, char** b, int* c, int* d, char** e, int* f) {
+    return PyArg_ParseTuple(args, "ssiisp", a, b, c, d, e, f);
 }
 
 int PyArg_ParseTuple_ss(PyObject* args, char** a, char** b) {

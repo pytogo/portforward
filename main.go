@@ -1,7 +1,7 @@
 package main
 
 // #include <Python.h>
-// int PyArg_ParseTuple_ssiis(PyObject* args, char** a, char** b, int* c, int* d, char** e);
+// int PyArg_ParseTuple_ssiisp(PyObject* args, char** a, char** b, int* c, int* d, char** e, int* f);
 // int PyArg_ParseTuple_ss(PyObject*, char**, char**);
 // void raise_exception(char *msg);
 import "C"
@@ -23,8 +23,9 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var toPort C.int
 
 	var configPath *C.char
+	var verbose C.int
 
-	if C.PyArg_ParseTuple_ssiis(args, &namespace, &podName, &fromPort, &toPort, &configPath) == 0 {
+	if C.PyArg_ParseTuple_ssiisp(args, &namespace, &podName, &fromPort, &toPort, &configPath, &verbose) == 0 {
 		C.raise_exception(C.CString("Could not parse args"))
 		return nil
 	}
@@ -33,8 +34,9 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var pod string = C.GoString(podName)
 
 	var cPath string = C.GoString(configPath)
+	var logVerbose = int(verbose) == 1
 
-	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath); err != nil {
+	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath, logVerbose); err != nil {
 		C.raise_exception(C.CString(err.Error()))
 		return nil
 	}
