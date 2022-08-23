@@ -84,12 +84,12 @@ install: clean ## install the package to the active Python's site-packages
 
 # ===== LINUX =====
 release-test-linux: clean ## package and upload a release to test.pypi
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38m cp39-cp39m cp310-cp310m"
+	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
 	python setup.py sdist
 	twine upload --repository testpypi dist/*
 
 release-linux: clean ## package and upload a release for linux
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38m cp39-cp39m cp310-cp310m"
+	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
 	python setup.py sdist
 	twine upload dist/*
 
