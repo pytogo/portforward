@@ -49,6 +49,7 @@ with Python versions:
 and architectures:
 
 * x84_64
+* arm64 (known as M1/Apple Chip - MacOS only)
 
 **Requirements for installation from source**
 
