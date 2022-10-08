@@ -182,6 +182,8 @@ github.com/pytogo/pytogo/portforward v0.0.0-20210909151537-5a598b94c121 h1:YjrOd
 github.com/pytogo/pytogo/portforward v0.0.0-20210909151537-5a598b94c121/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
 github.com/pytogo/pytogo/portforward v0.0.0-20220822195437-f2668e967a74 h1:JFKEKiBIbdGRfAZ4unECH/r8f3Vcv0tzmsble4zZ+9M=
 github.com/pytogo/pytogo/portforward v0.0.0-20220822195437-f2668e967a74/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
+github.com/pytogo/pytogo/portforward v0.0.0-20221008121207-9137d5f75cb4 h1:YEYNTOWicWPu/dfFLb4WQ66BFMUmukvZmNkCx5qyufM=
+github.com/pytogo/pytogo/portforward v0.0.0-20221008121207-9137d5f75cb4/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
 github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
