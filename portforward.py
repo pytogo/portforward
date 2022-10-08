@@ -56,7 +56,7 @@ def forward(
     :param to_port: Port inside the pod
     :param config_path: Path for loading kube config
     :param waiting: Delay in seconds
-    :param log_level: 
+    :param log_level: Level of logging
     :return: None
     """
 
@@ -71,7 +71,9 @@ def forward(
     config_path = _config_path(config_path)
 
     try:
-        _portforward.forward(namespace, pod, from_port, to_port, config_path, log_level.value)
+        _portforward.forward(
+            namespace, pod, from_port, to_port, config_path, log_level.value
+        )
 
         # Go and the port-forwarding needs some ms to be ready
         time.sleep(waiting)
