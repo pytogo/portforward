@@ -2,6 +2,10 @@
 History
 =======
 
+0.3.0 (2022-10-08)
+------------------
+* Introduction of logging level as replacement for verbose mode
+
 
 0.2.8 (2022-08-22)
 ------------------
