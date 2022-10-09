@@ -6,7 +6,6 @@ package main
 // void raise_exception(char *msg);
 import "C"
 import (
-	"fmt"
 	"github.com/pytogo/pytogo/portforward"
 )
 
@@ -36,8 +35,6 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 
 	var cPath string = C.GoString(configPath)
 	cLLevel := int(logLevel)
-
-	fmt.Printf(">>>> cLLevel=%d\n", cLLevel)
 
 	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath, cLLevel); err != nil {
 		C.raise_exception(C.CString(err.Error()))
