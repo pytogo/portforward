@@ -3,7 +3,7 @@ Go native module / Python C Extension
 """
 
 
-def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path: str, verbose: bool) -> None:
+def forward(namespace: str, pod: str, from_port: int, to_port: int, config_path: str, log_level: int) -> None:
     pass
 
 

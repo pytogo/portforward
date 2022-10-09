@@ -174,14 +174,8 @@ github.com/pkg/errors v0.9.1/go.mod h1:bwawxfHBFNV+L2hUp1rHADufV3IMtnDRdf1r5NINE
 github.com/pmezard/go-difflib v1.0.0 h1:4DBwDE0NGyQoBHbLQYPwSUPoCMWR5BEzIk/f1lZbAQM=
 github.com/pmezard/go-difflib v1.0.0/go.mod h1:iKH77koFhYxTK1pcRnkKkqfTogsbg7gZNVY4sRDYZ/4=
 github.com/prometheus/client_model v0.0.0-20190812154241-14fe0d1b01d4/go.mod h1:xMI15A0UPsDsEKsMN9yxemIoYk6Tm2C1GtYGdfGttqA=
-github.com/pytogo/pytogo v0.2.8 h1:msbm/uRkydnBvHyW9Kh+dSsFxcRQHgC4N8ZEgENTpu8=
-github.com/pytogo/pytogo v0.2.8/go.mod h1:CYR6i+ApK0k0lqnpuPNSWIr0C6MNQaRRVHuOfSqeXrI=
-github.com/pytogo/pytogo/portforward v0.0.0-20210905201127-a3c4eb1cd533 h1:fVv/ekyZZig2uzYcOdgnHZcBlkiKU/8kZlkr4bqMRlU=
-github.com/pytogo/pytogo/portforward v0.0.0-20210905201127-a3c4eb1cd533/go.mod h1:J1mdFVpVQtEpUq8jsDtZbyhXD7TqrOfVJwCByWiPJnY=
-github.com/pytogo/pytogo/portforward v0.0.0-20210909151537-5a598b94c121 h1:YjrOduPU/l0RnVemFogjoi5U5xrl4hI/8VCxgrlp0vU=
-github.com/pytogo/pytogo/portforward v0.0.0-20210909151537-5a598b94c121/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
-github.com/pytogo/pytogo/portforward v0.0.0-20220822195437-f2668e967a74 h1:JFKEKiBIbdGRfAZ4unECH/r8f3Vcv0tzmsble4zZ+9M=
-github.com/pytogo/pytogo/portforward v0.0.0-20220822195437-f2668e967a74/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
+github.com/pytogo/pytogo/portforward v0.0.0-20221009185702-e6b6ebe06e70 h1:GukGMw0FyaBy3QxJKKkQR+9Zweg8iJGZ0CfaHV3Etm0=
+github.com/pytogo/pytogo/portforward v0.0.0-20221009185702-e6b6ebe06e70/go.mod h1:5nvUczqVj7Vg2IJ0n6h4ZHYwoZi+mU06nTx4yFFPVRs=
 github.com/rogpeppe/go-internal v1.3.0/go.mod h1:M8bDsm7K2OlrFYOpmOWEs/qY81heoFRclV5y23lUDJ4=
 github.com/spf13/afero v1.2.2/go.mod h1:9ZxEEn6pIJ8Rxe320qSDBk6AsU0r9pR7Q4OcevTdifk=
 github.com/spf13/pflag v0.0.0-20170130214245-9ff6c6923cff/go.mod h1:DYY7MBk1bdzusC3SYhjObp+wFpr4gzcvqqNjLnInEg4=
