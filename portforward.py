@@ -5,11 +5,10 @@ Kubernetes Port-Forward Go-Edition For Python
 __version__ = "0.3.0"
 
 import contextlib
-from enum import Enum
-import logging
 import time
-from typing import Generator
+from enum import Enum
 from pathlib import Path
+from typing import Generator
 
 import _portforward
 
