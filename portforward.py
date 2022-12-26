@@ -8,7 +8,7 @@ import contextlib
 import time
 from enum import Enum
 from pathlib import Path
-from typing import Generator
+from typing import Generator, Optional
 
 import _portforward
 
@@ -31,7 +31,7 @@ def forward(
     pod: str,
     from_port: int,
     to_port: int,
-    config_path: str = None,
+    config_path: Optional[str] = None,
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.DEBUG,
     kube_context: str = "",
