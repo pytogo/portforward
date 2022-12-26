@@ -34,7 +34,7 @@ def forward(
     config_path: str = None,
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.DEBUG,
-    kube_context: str = ""
+    kube_context: str = "",
 ) -> Generator[None, None, None]:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
@@ -76,7 +76,13 @@ def forward(
 
     try:
         _portforward.forward(
-            namespace, pod, from_port, to_port, config_path, log_level.value, kube_context
+            namespace,
+            pod,
+            from_port,
+            to_port,
+            config_path,
+            log_level.value,
+            kube_context,
         )
 
         # Go and the port-forwarding needs some ms to be ready
