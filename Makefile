@@ -84,17 +84,18 @@ install: clean ## install the package to the active Python's site-packages
 
 # ===== LINUX =====
 release-test-linux: clean ## package and upload a release to test.pypi
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
+	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
 	python setup.py sdist
 	twine upload --repository testpypi dist/*
 
 release-linux: clean ## package and upload a release for linux
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310"
+	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
 	python setup.py sdist
 	twine upload dist/*
 
 # ===== WINDOWS =====
 release-test-windows: ## package and upload a release to test.pypi
+	python311 setup.py bdist_wheel
 	python310 setup.py bdist_wheel
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
@@ -103,7 +104,8 @@ release-test-windows: ## package and upload a release to test.pypi
 	python39 -m twine upload --repository testpypi dist\*
 
 release-windows: ## package and upload a release for Linux
-	python3.10 setup.py bdist_wheel
+	python311 setup.py bdist_wheel
+	python310 setup.py bdist_wheel
 	python39 setup.py bdist_wheel
 	python38 setup.py bdist_wheel
 	python37 setup.py bdist_wheel
@@ -112,6 +114,7 @@ release-windows: ## package and upload a release for Linux
 
 # ===== MACOS =====
 release-test-macos: clean ## package and upload a release to test.pypi
+	python3.11 setup.py bdist_wheel
 	python3.10 setup.py bdist_wheel
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
@@ -120,6 +123,7 @@ release-test-macos: clean ## package and upload a release to test.pypi
 	python3.9 -m twine upload --repository testpypi dist/*
 
 release-macos: clean ## package and upload a release for MacOS
+	python3.11 setup.py bdist_wheel
 	python3.10 setup.py bdist_wheel
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
