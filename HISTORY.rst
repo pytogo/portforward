@@ -2,6 +2,10 @@
 History
 =======
 
+0.3.1 (2022-12-26)
+------------------
+* Allow selecting kubernetes target context
+
 0.3.0 (2022-10-08)
 ------------------
 * Introduction of logging level as replacement for verbose mode

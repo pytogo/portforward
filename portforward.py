@@ -5,11 +5,10 @@ Kubernetes Port-Forward Go-Edition For Python
 __version__ = "0.3.0"
 
 import contextlib
-from enum import Enum
-import logging
 import time
-from typing import Generator
+from enum import Enum
 from pathlib import Path
+from typing import Generator, Optional
 
 import _portforward
 
@@ -32,9 +31,10 @@ def forward(
     pod: str,
     from_port: int,
     to_port: int,
-    config_path: str = None,
+    config_path: Optional[str] = None,
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.DEBUG,
+    kube_context: str = "",
 ) -> Generator[None, None, None]:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
@@ -57,6 +57,7 @@ def forward(
     :param config_path: Path for loading kube config
     :param waiting: Delay in seconds
     :param log_level: Level of logging
+    :param kube_context: Target kubernetes context (fallback is current context)
     :return: None
     """
 
@@ -70,9 +71,18 @@ def forward(
 
     config_path = _config_path(config_path)
 
+    kube_context = kube_context if kube_context else ""
+    _kube_context(kube_context)
+
     try:
         _portforward.forward(
-            namespace, pod, from_port, to_port, config_path, log_level.value
+            namespace,
+            pod,
+            from_port,
+            to_port,
+            config_path,
+            log_level.value,
+            kube_context,
         )
 
         # Go and the port-forwarding needs some ms to be ready
@@ -121,3 +131,11 @@ def _config_path(config_path_arg) -> str:
         return config_path_arg
 
     return str(Path.home() / ".kube" / "config")
+
+
+def _kube_context(arg):
+    if arg is None or not isinstance(arg, str):
+        raise ValueError(f"kube_context={arg} is not a valid str")
+
+    if "/" in arg:
+        raise ValueError(f"kube_context contains illegal character '/'")

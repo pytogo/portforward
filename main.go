@@ -1,7 +1,7 @@
 package main
 
 // #include <Python.h>
-// int PyArg_ParseTuple_ssiisi(PyObject* args, char** a, char** b, int* c, int* d, char** e, int* f);
+// int PyArg_ParseTuple_ssiisis(PyObject* args, char** a, char** b, int* c, int* d, char** e, int* f, char** g);
 // int PyArg_ParseTuple_ss(PyObject*, char**, char**);
 // void raise_exception(char *msg);
 import "C"
@@ -25,7 +25,9 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var configPath *C.char
 	var logLevel C.int
 
-	if C.PyArg_ParseTuple_ssiisi(args, &namespace, &podName, &fromPort, &toPort, &configPath, &logLevel) == 0 {
+	var kubeContext *C.char
+
+	if C.PyArg_ParseTuple_ssiisis(args, &namespace, &podName, &fromPort, &toPort, &configPath, &logLevel, &kubeContext) == 0 {
 		C.raise_exception(C.CString("Could not parse args"))
 		return nil
 	}
@@ -36,7 +38,9 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var cPath string = C.GoString(configPath)
 	cLLevel := int(logLevel)
 
-	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath, cLLevel); err != nil {
+	var kContext string = C.GoString(kubeContext)
+
+	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath, cLLevel, kContext); err != nil {
 		C.raise_exception(C.CString(err.Error()))
 		return nil
 	}
