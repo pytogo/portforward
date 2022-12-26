@@ -72,7 +72,7 @@ def forward(
     config_path = _config_path(config_path)
 
     kube_context = kube_context if kube_context else ""
-    _validate_str("kube_context", kube_context)
+    _kube_context(kube_context)
 
     try:
         _portforward.forward(
@@ -131,3 +131,11 @@ def _config_path(config_path_arg) -> str:
         return config_path_arg
 
     return str(Path.home() / ".kube" / "config")
+
+
+def _kube_context(arg):
+    if arg is None or not isinstance(arg, str):
+        raise ValueError(f"kube_context={arg} is not a valid str")
+
+    if "/" in arg:
+        raise ValueError(f"kube_context contains illegal character '/'")
