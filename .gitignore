@@ -234,3 +234,4 @@ modules.xml
 # Ignore all local history of files
 .history
 .ionide
+scripts
