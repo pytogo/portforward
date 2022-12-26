@@ -34,6 +34,7 @@ def forward(
     config_path: str = None,
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.DEBUG,
+    kube_context: str = ""
 ) -> Generator[None, None, None]:
     """
     Connects to a Pod and tunnels traffic from a local port to this pod.
@@ -56,6 +57,7 @@ def forward(
     :param config_path: Path for loading kube config
     :param waiting: Delay in seconds
     :param log_level: Level of logging
+    :param kube_context: Target kubernetes context (fallback is current context)
     :return: None
     """
 
@@ -69,9 +71,12 @@ def forward(
 
     config_path = _config_path(config_path)
 
+    kube_context = kube_context if kube_context else ""
+    _validate_str("kube_context", kube_context)
+
     try:
         _portforward.forward(
-            namespace, pod, from_port, to_port, config_path, log_level.value
+            namespace, pod, from_port, to_port, config_path, log_level.value, kube_context
         )
 
         # Go and the port-forwarding needs some ms to be ready
