@@ -2,7 +2,7 @@
 Kubernetes Port-Forward Go-Edition For Python
 """
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 import contextlib
 import time
