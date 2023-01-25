@@ -5,6 +5,7 @@ Kubernetes Port-Forward Go-Edition For Python
 __version__ = "0.3.1"
 
 import contextlib
+import os
 import time
 from enum import Enum
 from pathlib import Path
@@ -130,7 +131,9 @@ def _config_path(config_path_arg) -> str:
     elif config_path_arg:
         return config_path_arg
 
-    return str(Path.home() / ".kube" / "config")
+    alt_path = str(Path.home() / ".kube" / "config")
+
+    return os.environ.get('KUBECONFIG', alt_path)
 
 
 def _kube_context(arg):

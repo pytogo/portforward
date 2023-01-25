@@ -2,6 +2,10 @@
 History
 =======
 
+0.4.0 (unknown)
+---------------
+* Respect environment variable KUBECONFIG
+
 0.3.1 (2022-12-26)
 ------------------
 * Allow selecting kubernetes target context
