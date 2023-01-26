@@ -29,7 +29,7 @@ class LogLevel(Enum):
 @contextlib.contextmanager
 def forward(
     namespace: str,
-    pod: str,
+    pod_or_service: str,
     from_port: int,
     to_port: int,
     config_path: Optional[str] = None,
@@ -38,8 +38,10 @@ def forward(
     kube_context: str = "",
 ) -> Generator[None, None, None]:
     """
-    Connects to a Pod and tunnels traffic from a local port to this pod.
+    Connects to a **pod or service** and tunnels traffic from a local port to this target.
     It uses the kubectl kube config from the home dir if no path is provided.
+
+    The libary will figure out for you if it has to target a pod or service.
 
     Caution: Go and the port-forwarding needs some ms to be ready. ``waiting``
     can be used to wait until the port-forward is ready.
@@ -48,11 +50,11 @@ def forward(
 
     Example:
         >>> import portforward
-        >>> with portforward.forward("test", "web", 9000, 80):
+        >>> with portforward.forward("test", "web-svc", 9000, 80):
         >>>     # Do work
 
     :param namespace: Target namespace
-    :param pod: Name of target Pod
+    :param pod_or_service: Name of target Pod or service
     :param from_port: Local port
     :param to_port: Port inside the pod
     :param config_path: Path for loading kube config
@@ -63,7 +65,7 @@ def forward(
     """
 
     _validate_str("namespace", namespace)
-    _validate_str("pod", pod)
+    _validate_str("pod_or_service", pod_or_service)
 
     _validate_port("from_port", from_port)
     _validate_port("to_port", to_port)
@@ -78,7 +80,7 @@ def forward(
     try:
         _portforward.forward(
             namespace,
-            pod,
+            pod_or_service,
             from_port,
             to_port,
             config_path,
@@ -96,7 +98,7 @@ def forward(
         raise PortforwardError(err) from None
 
     finally:
-        _portforward.stop(namespace, pod)
+        _portforward.stop(namespace, pod_or_service)
 
 
 # ===== PRIVATE =====

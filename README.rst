@@ -79,7 +79,7 @@ Quickstart
 
     def main():
         namespace = "test"
-        pod_name = "web"
+        pod_name = "web"  # You can also use a service name instead
         local_port = 9000  # from port
         pod_port = 80  # to port
 
@@ -98,6 +98,9 @@ Features
 
 * Go native Kubernetes port-forwarding with the ``.kube/config`` from the home dir
   or any other path to config.
+* Portforward for pods and services - the lib will first look for a pod with matching name then for
+  a service
+* Waiting for a pod to become ready
 
 
 Credits

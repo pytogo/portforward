@@ -5,6 +5,8 @@ History
 0.4.0 (unknown)
 ---------------
 * Respect environment variable KUBECONFIG
+* Wait if a pod is not ready yet
+* Be able to use service as targets
 
 0.3.1 (2022-12-26)
 ------------------
