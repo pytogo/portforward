@@ -6,7 +6,7 @@ package main
 // void raise_exception(char *msg);
 import "C"
 import (
-	"github.com/pytogo/pytogo/portforward"
+	"github.com/pytogo/portforward/internal/portforward"
 )
 
 //export forward
