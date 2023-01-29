@@ -107,8 +107,7 @@ Development
 -----------
 
 In case you want to develop on this library itself you need the required tools for installing
-``portforward`` from source. In addition you can change the ``go.mod`` file to point to local
-version ``github.com/pytogo/pytogo/portforward``.
+``portforward`` from source.
 
 
 Credits
