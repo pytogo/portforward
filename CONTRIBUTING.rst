@@ -97,7 +97,7 @@ activates the compiling:
 
     $ mkvirtualenv portforward
     $ cd portforward/
-    $ python setup.py develop
+    $ python setup.py install
 
 4. Create a branch for local development::
 
@@ -106,11 +106,9 @@ activates the compiling:
    Now you can make your changes locally.
 
 5. When you're done making changes, check that your changes pass flake8 and the
-   tests, including testing other Python versions with tox::
+   tests::
 
-    $ flake8 portforward tests
-    $ python setup.py test or pytest
-    $ tox
+    $ make check
 
    To get flake8 and tox, just pip install them into your virtualenv.
 
@@ -134,13 +132,6 @@ Before you submit a pull request, check that it meets these guidelines:
 3. The pull request should work for Python 3.5, 3.6, 3.7 and 3.8, and for PyPy. Check
    https://travis-ci.com/pytogo/portforward/pull_requests
    and make sure that the tests pass for all supported Python versions.
-
-Tips
-----
-
-To run a subset of tests::
-
-$ pytest tests.test_portforward
 
 
 Deploying
