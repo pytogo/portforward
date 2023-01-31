@@ -16,13 +16,9 @@ portforward
         :target: https://portforward.readthedocs.io/en/latest/?version=latest
         :alt: Documentation Status
 
-.. image:: https://github.com/pytogo/portforward/actions/workflows/python.yml/badge.svg
-        :target: https://github.com/pytogo/portforward/actions/workflows/python.yml
-        :alt: Python
-
-.. image:: https://github.com/pytogo/portforward/actions/workflows/go.yml/badge.svg
-        :target: https://github.com/pytogo/portforward/actions/workflows/go.yml
-        :alt: Go
+.. image:: https://github.com/pytogo/portforward/actions/workflows/python-app.yml/badge.svg
+        :target: https://github.com/pytogo/portforward/actions
+        :alt: Build status
 
 
 
