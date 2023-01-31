@@ -2,8 +2,12 @@
 History
 =======
 
-0.4.0 (unknown)
----------------
+0.4.1 (2023-01-31)
+------------------
+* Integrate Go portforward code 
+
+0.4.0 (2023-01-31)
+------------------
 * Respect environment variable KUBECONFIG
 * Wait if a pod is not ready yet
 * Be able to use service as targets
