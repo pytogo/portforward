@@ -2,10 +2,6 @@
 History
 =======
 
-0.4.1 (2023-01-31)
-------------------
-* Integrate Go portforward code 
-
 0.4.0 (2023-01-31)
 ------------------
 * Respect environment variable KUBECONFIG
