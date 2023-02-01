@@ -2,6 +2,10 @@
 History
 =======
 
+0.4.1 (2023-02-01)
+------------------
+* Bump pytogo/portforward version
+
 0.4.0 (2023-01-31)
 ------------------
 * Respect environment variable KUBECONFIG
