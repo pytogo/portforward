@@ -43,6 +43,8 @@ def forward(
 
     The libary will figure out for you if it has to target a pod or service.
 
+    It will fall back to in-cluster-config in case no kube config file exists.
+
     Caution: Go and the port-forwarding needs some ms to be ready. ``waiting``
     can be used to wait until the port-forward is ready.
 
