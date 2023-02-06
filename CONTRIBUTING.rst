@@ -67,10 +67,11 @@ Get Started!
 Ready to contribute? Here's how to set up `portforward` for local development.
 
 
-External requirements of this project:
+Requirements of this project:
 
 * Golang
 * gcc
+* Python dependencies in requirement-dev.txt
 
 This project uses setuptools-golang_. It will be install through ``pip`` with
 the requirements-dev.txt. The following additional lines in the ``setup.py``

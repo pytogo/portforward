@@ -106,9 +106,7 @@ Features
 Development
 -----------
 
-In case you want to develop on this library itself you need the required tools for installing
-``portforward`` from source.
-
+In case you want to develop on this library itself please take a look at the CONTRIBUTING page.
 
 Credits
 -------
