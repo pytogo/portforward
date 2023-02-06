@@ -135,7 +135,9 @@ def _config_path(config_path_arg) -> str:
 
     alt_path = str(Path.home() / ".kube" / "config")
 
-    return os.environ.get("KUBECONFIG", alt_path)
+    config_path = os.environ.get("KUBECONFIG", alt_path)
+
+    return config_path if os.path.isfile(config_path) else ""
 
 
 def _kube_context(arg):
