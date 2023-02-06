@@ -2,6 +2,10 @@
 History
 =======
 
+0.4.2 (2023-02-06)
+------------------
+* Use in-cluster-config when no kube config file is available
+
 0.4.1 (2023-02-01)
 ------------------
 * Bump pytogo/portforward version
