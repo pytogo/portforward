@@ -2,6 +2,10 @@
 History
 =======
 
+0.4.3 (2023-02-27)
+------------------
+* Throw error instead of panic when port is in usage
+
 0.4.2 (2023-02-06)
 ------------------
 * Use in-cluster-config when no kube config file is available
