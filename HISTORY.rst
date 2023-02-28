@@ -2,6 +2,10 @@
 History
 =======
 
+0.4.4 (2023-02-28)
+------------------
+* Fix endless waiting
+
 0.4.3 (2023-02-27)
 ------------------
 * Throw error instead of panic when port is in usage
