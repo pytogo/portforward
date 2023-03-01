@@ -5,8 +5,9 @@ package main
 // int PyArg_ParseTuple_ss(PyObject*, char**, char**);
 // void raise_exception(char *msg);
 import "C"
+
 import (
-	"github.com/pytogo/pytogo/portforward"
+	"github.com/pytogo/portforward/internal"
 )
 
 //export forward
@@ -40,7 +41,7 @@ func forward(self *C.PyObject, args *C.PyObject) *C.PyObject {
 
 	var kContext string = C.GoString(kubeContext)
 
-	if err := portforward.Forward(ns, pod, int(fromPort), int(toPort), cPath, cLLevel, kContext); err != nil {
+	if err := internal.Forward(ns, pod, int(fromPort), int(toPort), cPath, cLLevel, kContext); err != nil {
 		C.raise_exception(C.CString(err.Error()))
 		return nil
 	}
@@ -67,7 +68,7 @@ func stop(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var ns string = C.GoString(namespace)
 	var pod string = C.GoString(podName)
 
-	portforward.StopForwarding(ns, pod)
+	internal.StopForwarding(ns, pod)
 
 	C.Py_IncRef(C.Py_None)
 	return C.Py_None
