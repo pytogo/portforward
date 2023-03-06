@@ -318,9 +318,9 @@ func startForward(dialer httpstream.Dialer, ports string, stopChan, readyChan ch
 	// Locks until stopChan is closed.
 	go func() {
 		if err = forwarder.ForwardPorts(); err != nil {
+			log.Error(err.Error())
 			errCh <- err
 		}
-		log.Error(err.Error())
 
 		close(errCh)
 	}()

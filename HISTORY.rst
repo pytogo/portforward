@@ -6,6 +6,11 @@ unreleased
 ----------
 * Move pytogo Go code into portforward
 
+0.4.5 (2023-03-06)
+------------------
+* Fix panic when logging an error
+* Change default log level to INFO
+
 0.4.4 (2023-02-28)
 ------------------
 * Fix endless waiting

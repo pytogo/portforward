@@ -34,7 +34,7 @@ def forward(
     to_port: int,
     config_path: Optional[str] = None,
     waiting: float = 0.1,
-    log_level: LogLevel = LogLevel.DEBUG,
+    log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
 ) -> Generator[None, None, None]:
     """

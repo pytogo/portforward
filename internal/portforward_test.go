@@ -1,4 +1,4 @@
-package portforward
+package internal
 
 import (
 	"testing"
