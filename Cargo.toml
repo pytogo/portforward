@@ -18,8 +18,9 @@ ws = ["kube/ws"]
 latest = ["k8s-openapi/v1_26"]
 
 [dependencies]
+pyo3 = "^0.18.0"
+pyo3-asyncio = { version = "^0.18.0", features = ["attributes", "tokio-runtime"] }
 once_cell = "1.17.1"
-pyo3 = "0.18.1"
 typed-builder = "0.14.0"
 futures = "0.3.17"
 tracing = "0.1.36"

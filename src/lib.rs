@@ -5,6 +5,7 @@ mod portforward;
 /// Creates a connection to a pod.
 #[pyfunction]
 fn forward(
+    py: Python<'_>,
     namespace: String,
     pod_or_service: String,
     from_port: u64,
@@ -12,8 +13,8 @@ fn forward(
     config_path: String,
     log_level: u64,
     kube_context: String,
-) -> PyResult<()> {
-    let _config = portforward::ForwardConfig::builder()
+) -> PyResult<&PyAny> {
+    let config = portforward::ForwardConfig::builder()
         .namespace(namespace)
         .pod_or_service(pod_or_service)
         .from_port(from_port)
@@ -23,13 +24,19 @@ fn forward(
         .kube_context(kube_context)
         .build();
 
-    Ok(())
+    pyo3_asyncio::tokio::future_into_py(py, async {
+        portforward::forward(config).await;
+        Ok(Python::with_gil(|py| py.None()))
+    })
 }
 
 /// Stops a connection to a pod.
 #[pyfunction]
-fn stop(namespace: String, pod_or_service: String) -> PyResult<()> {
-    Ok(())
+fn stop(py: Python<'_>, namespace: String, pod_or_service: String) -> PyResult<&PyAny> {
+    pyo3_asyncio::tokio::future_into_py(py, async {
+        portforward::stop(namespace, pod_or_service).await;
+        Ok(Python::with_gil(|py| py.None()))
+    })
 }
 
 /// A Python module implemented in Rust.
