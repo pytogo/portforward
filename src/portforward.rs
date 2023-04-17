@@ -15,13 +15,14 @@ use std::net::SocketAddr;
 use tokio::{
     io::{AsyncRead, AsyncWrite},
     net::TcpListener,
-    sync::RwLock,
+    sync::oneshot::{self, Receiver},
+    sync::{oneshot::Sender, RwLock},
 };
 use tokio_stream::wrappers::TcpListenerStream;
 use tracing::*;
 use typed_builder::TypedBuilder;
 
-static OPEN_PORTFORWARDS: Lazy<RwLock<HashMap<String, String>>> = Lazy::new(|| {
+static OPEN_PORTFORWARDS: Lazy<RwLock<HashMap<String, Sender<()>>>> = Lazy::new(|| {
     let m = HashMap::new();
     RwLock::new(m)
 });
@@ -40,6 +41,8 @@ pub struct ForwardConfig {
 /// Creates a connection to a pod.
 pub async fn forward(config: ForwardConfig) {
     tracing_subscriber::fmt::init();
+
+    let q_name = QualifiedName::new(config.namespace, TargetType::Pod, config.pod_or_service);
     let client = Client::try_default().await.unwrap();
 
     let pods: Api<Pod> = Api::default_namespaced(client);
@@ -58,32 +61,44 @@ pub async fn forward(config: ForwardConfig) {
         "try opening http://{0} in a browser, or `curl http://{0}`",
         addr
     );
-    info!("use Ctrl-C to stop the server and delete the pod");
-    let server = TcpListenerStream::new(TcpListener::bind(addr).await.unwrap())
-        .take_until(tokio::signal::ctrl_c())
-        .try_for_each(|client_conn| async {
-            if let Ok(peer_addr) = client_conn.peer_addr() {
-                info!(%peer_addr, "new connection");
-            }
-            let pods = pods.clone();
-            tokio::spawn(async move {
-                if let Err(e) = forward_connection(&pods, "nginx", 80, client_conn).await {
-                    error!(
-                        error = e.as_ref() as &dyn std::error::Error,
-                        "failed to forward connection"
-                    );
+
+    let (tx, rx): (Sender<()>, Receiver<()>) = oneshot::channel();
+    register_forward(q_name, tx).await;
+
+    tokio::spawn(async move {
+        let server = TcpListenerStream::new(TcpListener::bind(addr).await.unwrap())
+            .take_until(rx)
+            .try_for_each(|client_conn| async {
+                if let Ok(peer_addr) = client_conn.peer_addr() {
+                    info!(%peer_addr, "new connection");
                 }
+                let pods = pods.clone();
+                tokio::spawn(async move {
+                    if let Err(e) = forward_connection(&pods, "nginx", 80, client_conn).await {
+                        error!(
+                            error = e.as_ref() as &dyn std::error::Error,
+                            "failed to forward connection"
+                        );
+                    }
+                });
+                // keep the server running
+                Ok(())
             });
-            // keep the server running
-            Ok(())
-        });
-    if let Err(e) = server.await {
-        error!(error = &e as &dyn std::error::Error, "server error");
-    }
+        if let Err(e) = server.await {
+            error!(error = &e as &dyn std::error::Error, "server error");
+        }
+    });
 }
 
 /// Stops a connection to a pod.
-pub async fn stop(namespace: String, pod_or_service: String) {}
+pub async fn stop(namespace: String, pod_or_service: String) {
+    let q_name = QualifiedName::new(namespace, TargetType::Pod, pod_or_service);
+    let key = q_name.to_string();
+
+    if let Some(tx) = OPEN_PORTFORWARDS.write().await.remove(&key) {
+        tx.send(()).unwrap();
+    }
+}
 
 async fn forward_connection(
     pods: &Api<Pod>,
@@ -130,9 +145,9 @@ impl QualifiedName {
     }
 }
 
-async fn register_forward(qualified_name: QualifiedName, conn: String) {
+async fn register_forward(qualified_name: QualifiedName, sender: Sender<()>) {
     OPEN_PORTFORWARDS
         .write()
         .await
-        .insert(qualified_name.to_string(), conn);
+        .insert(qualified_name.to_string(), sender);
 }
