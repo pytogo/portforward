@@ -38,11 +38,13 @@ pub struct ForwardConfig {
     kube_context: String,
 }
 
-/// Creates a connection to a pod.
-pub async fn forward(config: ForwardConfig) {
+/// Creates a connection to a pod. It returns the actual pod name for the portforward.
+/// It differs from `pod_or_service` when `pod_or_service` represents a service.
+pub async fn forward(config: ForwardConfig) -> String {
     tracing_subscriber::fmt::init();
 
-    let q_name = QualifiedName::new(config.namespace, TargetType::Pod, config.pod_or_service);
+    let q_name = QualifiedName::new(config.namespace, config.pod_or_service);
+    let target_pod = q_name.pod_name.clone();
 
     let kube_config = kube::config::Kubeconfig::read_from(config.config_path).unwrap();
     let mut options = kube::config::KubeConfigOptions::default();
@@ -53,7 +55,7 @@ pub async fn forward(config: ForwardConfig) {
     let client = Client::try_from(client_config).unwrap();
     let pods: Api<Pod> = Api::namespaced(client, &q_name.namespace);
 
-    let running = await_condition(pods.clone(), &q_name.name, is_pod_running());
+    let running = await_condition(pods.clone(), &q_name.pod_name, is_pod_running());
     let _ = tokio::time::timeout(std::time::Duration::from_secs(30), running)
         .await
         .unwrap();
@@ -69,7 +71,7 @@ pub async fn forward(config: ForwardConfig) {
             .try_for_each(|client_conn| async {
                 let pods = pods.clone();
                 let pod_port = config.to_port;
-                let pod_name = q_name.name.clone();
+                let pod_name = q_name.pod_name.clone();
 
                 tokio::spawn(async move {
                     if let Err(e) =
@@ -88,11 +90,13 @@ pub async fn forward(config: ForwardConfig) {
             error!(error = &e as &dyn std::error::Error, "server error");
         }
     });
+
+    return target_pod;
 }
 
 /// Stops a connection to a pod.
 pub async fn stop(namespace: String, pod_or_service: String) {
-    let q_name = QualifiedName::new(namespace, TargetType::Pod, pod_or_service);
+    let q_name = QualifiedName::new(namespace, pod_or_service);
     let key = q_name.to_string();
 
     if let Some(tx) = OPEN_PORTFORWARDS.write().await.remove(&key) {
@@ -118,29 +122,21 @@ async fn forward_connection(
 
 // ===== ===== HELPER ===== =====
 
-#[derive(Debug)]
-enum TargetType {
-    Service,
-    Pod,
-}
-
 struct QualifiedName {
     namespace: String,
-    target_type: TargetType,
-    name: String,
+    pod_name: String,
 }
 
 impl QualifiedName {
-    fn new(namespace: String, target_type: TargetType, name: String) -> Self {
+    fn new(namespace: String, name: String) -> Self {
         Self {
             namespace,
-            target_type,
-            name,
+            pod_name: name,
         }
     }
 
     fn to_string(&self) -> String {
-        format!("{}/{}", self.namespace, self.name)
+        format!("{}/{}", self.namespace, self.pod_name)
     }
 }
 

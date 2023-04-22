@@ -24,10 +24,7 @@ fn forward(
         .kube_context(kube_context)
         .build();
 
-    pyo3_asyncio::tokio::future_into_py(py, async {
-        portforward::forward(config).await;
-        Ok(Python::with_gil(|py| py.None()))
-    })
+    pyo3_asyncio::tokio::future_into_py(py, async { Ok(portforward::forward(config).await) })
 }
 
 /// Stops a connection to a pod.

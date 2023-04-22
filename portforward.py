@@ -4,6 +4,7 @@ Kubernetes Port-Forward Go-Edition For Python
 
 __version__ = "0.4.5"
 
+import asyncio
 import contextlib
 import os
 import time
@@ -79,19 +80,22 @@ def forward(
     kube_context = kube_context if kube_context else ""
     _kube_context(kube_context)
 
-    try:
-        _portforward.forward(
-            namespace,
-            pod_or_service,
-            from_port,
-            to_port,
-            config_path,
-            log_level.value,
-            kube_context,
-        )
+    actual_pod_name = ""
 
-        # Go and the port-forwarding needs some ms to be ready
-        time.sleep(waiting)
+    try:
+
+        async def pf():
+            _portforward.forward(
+                namespace,
+                pod_or_service,
+                from_port,
+                to_port,
+                config_path,
+                log_level.value,
+                kube_context,
+            )
+
+        actual_pod_name = asyncio.run(pf())
 
         yield None
 
@@ -100,7 +104,7 @@ def forward(
         raise PortforwardError(err) from None
 
     finally:
-        _portforward.stop(namespace, pod_or_service)
+        _portforward.stop(namespace, actual_pod_name)
 
 
 # ===== PRIVATE =====
