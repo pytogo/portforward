@@ -43,9 +43,15 @@ pub async fn forward(config: ForwardConfig) {
     tracing_subscriber::fmt::init();
 
     let q_name = QualifiedName::new(config.namespace, TargetType::Pod, config.pod_or_service);
-    let client = Client::try_default().await.unwrap();
 
-    let pods: Api<Pod> = Api::default_namespaced(client);
+    let kube_config = kube::config::Kubeconfig::read_from(config.config_path).unwrap();
+    let mut options = kube::config::KubeConfigOptions::default();
+    options.context = Some(config.kube_context);
+    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options)
+        .await
+        .unwrap();
+    let client = Client::try_from(client_config).unwrap();
+    let pods: Api<Pod> = Api::namespaced(client, &q_name.namespace);
 
     let running = await_condition(pods.clone(), &q_name.name, is_pod_running());
     let _ = tokio::time::timeout(std::time::Duration::from_secs(30), running)
@@ -66,7 +72,9 @@ pub async fn forward(config: ForwardConfig) {
                 let pod_name = q_name.name.clone();
 
                 tokio::spawn(async move {
-                    if let Err(e) = forward_connection(&pods, &pod_name, pod_port, client_conn).await {
+                    if let Err(e) =
+                        forward_connection(&pods, &pod_name, pod_port, client_conn).await
+                    {
                         error!(
                             error = e.as_ref() as &dyn std::error::Error,
                             "failed to forward connection"
