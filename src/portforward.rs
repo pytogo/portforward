@@ -9,6 +9,7 @@ use kube::{
     runtime::wait::{await_condition, conditions::is_pod_running},
     Client,
 };
+use log::*;
 use once_cell::sync::Lazy;
 use std::collections::HashMap;
 use std::net::SocketAddr;
@@ -19,7 +20,6 @@ use tokio::{
     sync::{oneshot::Sender, RwLock},
 };
 use tokio_stream::wrappers::TcpListenerStream;
-use tracing::*;
 use typed_builder::TypedBuilder;
 
 static OPEN_PORTFORWARDS: Lazy<RwLock<HashMap<String, Sender<()>>>> = Lazy::new(|| {
@@ -34,15 +34,12 @@ pub struct ForwardConfig {
     from_port: u16,
     to_port: u16,
     config_path: String,
-    log_level: u64,
     kube_context: String,
 }
 
 /// Creates a connection to a pod. It returns the actual pod name for the portforward.
 /// It differs from `pod_or_service` when `pod_or_service` represents a service.
 pub async fn forward(config: ForwardConfig) -> String {
-    tracing_subscriber::fmt::init();
-
     let q_name = QualifiedName::new(config.namespace, config.pod_or_service);
     let target_pod = q_name.pod_name.clone();
 
@@ -74,20 +71,16 @@ pub async fn forward(config: ForwardConfig) -> String {
                 let pod_name = q_name.pod_name.clone();
 
                 tokio::spawn(async move {
-                    if let Err(e) =
-                        forward_connection(&pods, &pod_name, pod_port, client_conn).await
-                    {
-                        error!(
-                            error = e.as_ref() as &dyn std::error::Error,
-                            "failed to forward connection"
-                        );
+                    let forwarding = forward_connection(&pods, &pod_name, pod_port, client_conn);
+                    if let Err(e) = forwarding.await {
+                        error!("failed to forward connection: {}", e);
                     }
                 });
                 // keep the server running
                 Ok(())
             });
         if let Err(e) = server.await {
-            error!(error = &e as &dyn std::error::Error, "server error");
+            error!("server error: {}", e);
         }
     });
 

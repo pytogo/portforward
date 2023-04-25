@@ -85,7 +85,7 @@ def forward(
     try:
 
         async def pf():
-            _portforward.forward(
+            await _portforward.forward(
                 namespace,
                 pod_or_service,
                 from_port,
@@ -104,7 +104,7 @@ def forward(
         raise PortforwardError(err) from None
 
     finally:
-        _portforward.stop(namespace, actual_pod_name)
+        _portforward.stop(namespace, actual_pod_name, log_level.value)
 
 
 # ===== PRIVATE =====

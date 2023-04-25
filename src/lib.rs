@@ -14,13 +14,14 @@ fn forward(
     log_level: u64,
     kube_context: String,
 ) -> PyResult<&PyAny> {
+    init_log(log_level);
+
     let config = portforward::ForwardConfig::builder()
         .namespace(namespace)
         .pod_or_service(pod_or_service)
         .from_port(from_port)
         .to_port(to_port)
         .config_path(config_path)
-        .log_level(log_level)
         .kube_context(kube_context)
         .build();
 
@@ -29,7 +30,14 @@ fn forward(
 
 /// Stops a connection to a pod.
 #[pyfunction]
-fn stop(py: Python<'_>, namespace: String, pod_or_service: String) -> PyResult<&PyAny> {
+fn stop(
+    py: Python<'_>,
+    namespace: String,
+    pod_or_service: String,
+    log_level: u64,
+) -> PyResult<&PyAny> {
+    init_log(log_level);
+
     pyo3_asyncio::tokio::future_into_py(py, async {
         portforward::stop(namespace, pod_or_service).await;
         Ok(Python::with_gil(|py| py.None()))
@@ -42,4 +50,28 @@ fn _portforward(_py: Python, m: &PyModule) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(forward, m)?)?;
     m.add_function(wrap_pyfunction!(stop, m)?)?;
     Ok(())
+}
+
+/*
+   DEBUG = 0
+   INFO = 1
+   WARN = 2
+   ERROR = 3
+   OFF = 4
+*/
+// ===== ===== HELPER ===== =====
+fn init_log(log_level: u64) {
+    let level = match log_level {
+        0 => log::LevelFilter::Debug,
+        1 => log::LevelFilter::Info,
+        2 => log::LevelFilter::Warn,
+        3 => log::LevelFilter::Error,
+        _ => log::LevelFilter::Off,
+    };
+
+    let init_result = env_logger::builder().filter_level(level).try_init();
+
+    if let Err(err) = init_result {
+        eprintln!("{err}");
+    }
 }
