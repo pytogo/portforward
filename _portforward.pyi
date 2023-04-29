@@ -2,7 +2,7 @@
 Rust native module / Python C Extension
 """
 
-def forward(
+async def forward(
     namespace: str,
     pod_or_service: str,
     from_port: int,
@@ -13,5 +13,5 @@ def forward(
 ) -> None:
     pass
 
-def stop(namespace: str, pod_or_service: str, log_level: int) -> None:
+async def stop(namespace: str, pod_or_service: str, log_level: int) -> None:
     pass

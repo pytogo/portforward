@@ -7,7 +7,6 @@ __version__ = "0.4.5"
 import asyncio
 import contextlib
 import os
-import time
 from enum import Enum
 from pathlib import Path
 from typing import Generator, Optional
@@ -67,35 +66,20 @@ def forward(
     :return: None
     """
 
-    _validate_str("namespace", namespace)
-    _validate_str("pod_or_service", pod_or_service)
-
-    _validate_port("from_port", from_port)
-    _validate_port("to_port", to_port)
-
-    _validate_log(log_level)
-
-    config_path = _config_path(config_path)
-
-    kube_context = kube_context if kube_context else ""
-    _kube_context(kube_context)
-
-    actual_pod_name = ""
+    forwarder = PortForwarder(
+        namespace,
+        pod_or_service,
+        from_port,
+        to_port,
+        config_path,
+        waiting,
+        log_level,
+        kube_context,
+    )
 
     try:
 
-        async def pf():
-            await _portforward.forward(
-                namespace,
-                pod_or_service,
-                from_port,
-                to_port,
-                config_path,
-                log_level.value,
-                kube_context,
-            )
-
-        actual_pod_name = asyncio.run(pf())
+        asyncio.run(forwarder.forward())
 
         yield None
 
@@ -104,13 +88,56 @@ def forward(
         raise PortforwardError(err) from None
 
     finally:
-        _portforward.stop(namespace, actual_pod_name, log_level.value)
+        asyncio.run(forwarder.stop())
+
+
+class PortForwarder:
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self.namespace: str = _validate_str("namespace", namespace)
+        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
+        self.from_port: int = _validate_port("from_port", from_port)
+        self.to_port: int = _validate_port("to_port", to_port)
+        self.log_level: LogLevel = _validate_log(log_level)
+        self.waiting: float = waiting
+
+        self.config_path: str = _config_path(config_path)
+        self.kube_context: str = kube_context if kube_context else ""
+
+        _kube_context(kube_context)
+
+        self.actual_pod_name: str = ""
+
+    async def forward(self):
+        self.actual_pod_name = await _portforward.forward(
+            self.namespace,
+            self.pod_or_service,
+            self.from_port,
+            self.to_port,
+            self.config_path,
+            self.log_level.value,
+            self.kube_context,
+        )
+
+    async def stop(self):
+        await _portforward.stop(
+            self.namespace, self.actual_pod_name, self.log_level.value
+        )
 
 
 # ===== PRIVATE =====
 
 
-def _validate_str(arg_name, arg):
+def _validate_str(arg_name, arg) -> str:
     if arg is None or not isinstance(arg, str):
         raise ValueError(f"{arg_name}={arg} is not a valid str")
 
@@ -120,16 +147,22 @@ def _validate_str(arg_name, arg):
     if "/" in arg:
         raise ValueError(f"{arg_name} contains illegal character '/'")
 
+    return arg
 
-def _validate_port(arg_name, arg):
+
+def _validate_port(arg_name, arg) -> int:
     in_range = arg and 0 < arg < 65536
     if arg is None or not isinstance(arg, int) or not in_range:
         raise ValueError(f"{arg_name}={arg} is not a valid port")
+
+    return arg
 
 
 def _validate_log(log_level):
     if not isinstance(log_level, LogLevel):
         raise ValueError(f"log_level={log_level} is not a valid LogLevel")
+
+    return log_level
 
 
 def _config_path(config_path_arg) -> str:
