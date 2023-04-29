@@ -54,6 +54,12 @@ def forward(
         >>> import portforward
         >>> with portforward.forward("test", "web-svc", 9000, 80):
         >>>     # Do work
+        >>>
+        >>> # Or without context manager
+        >>>
+        >>> forwarder = portforward.forward("test", "some-pod", 9000, 80)
+        >>> # Do work
+        >>> forwarder.stop()
 
     :param namespace: Target namespace
     :param pod_or_service: Name of target Pod or service
@@ -63,7 +69,7 @@ def forward(
     :param waiting: Delay in seconds
     :param log_level: Level of logging
     :param kube_context: Target kubernetes context (fallback is current context)
-    :return: None
+    :return: forwarder to manual stop the forwarding
     """
 
     forwarder = PortForwarder(
@@ -81,7 +87,7 @@ def forward(
 
         asyncio.run(forwarder.forward())
 
-        yield None
+        yield forwarder
 
     except RuntimeError as err:
         # Suppress extension exception
@@ -116,6 +122,7 @@ class PortForwarder:
         _kube_context(kube_context)
 
         self.actual_pod_name: str = ""
+        self.is_stopped: bool = False
 
     async def forward(self):
         self.actual_pod_name = await _portforward.forward(
@@ -132,6 +139,9 @@ class PortForwarder:
         await _portforward.stop(
             self.namespace, self.actual_pod_name, self.log_level.value
         )
+
+    def is_stopped(self):
+        return self.is_stopped
 
 
 # ===== PRIVATE =====
