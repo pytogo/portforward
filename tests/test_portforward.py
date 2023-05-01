@@ -1,8 +1,6 @@
-"""
-Tests for `portforward` package.
+import sys
+sys.path.append(".")
 
-!!! It will only test the Python side !!!
-"""
 import uuid
 
 import pytest

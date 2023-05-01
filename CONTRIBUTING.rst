@@ -69,8 +69,8 @@ Ready to contribute? Here's how to set up `portforward` for local development.
 
 Requirements of this project:
 
-* Golang
-* gcc
+* Rust
+* k3s for unit tests
 * Python dependencies in requirement-dev.txt
 
 This project uses setuptools-golang_. It will be install through ``pip`` with
