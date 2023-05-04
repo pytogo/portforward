@@ -1,2 +1,4 @@
 maturin==0.14.17
 black
+pytest-kind
+requests

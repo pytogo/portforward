@@ -1,13 +1,42 @@
-"""
-Tests for `portforward` package.
+import sys
+import time
 
-!!! It will only test the Python side !!!
-"""
+from pytest_kind import KindCluster
+
+sys.path.append(".")
+
 import uuid
 
 import pytest
 
 import portforward
+import requests
+
+
+TEST_NAMESPACE = "pftest"
+
+
+def test_pod_portforward_with_success(kind_cluster: KindCluster):
+    # Arrange
+    _create_test_resources(kind_cluster)
+
+    # Act & Assert
+    pod_name = "nginx"
+    local_port = 9000  # from port
+    pod_port = 80  # to port
+    context = kind_cluster.name
+    config = str(kind_cluster.kubeconfig_path.absolute())
+
+    with portforward.forward(
+        TEST_NAMESPACE,
+        pod_name,
+        local_port,
+        pod_port,
+        config_path=config,
+        kube_context=context,
+    ):
+        response: requests.Response = requests.get("http://localhost:9000")
+        assert response.status_code == 200
 
 
 @pytest.mark.parametrize(
@@ -33,7 +62,7 @@ import portforward
         ("test", "web", 9000, 80.1),
         ("test", "web", 9000, -80),
         ("test", "web", 9000, None),
-    ]
+    ],
 )
 def test_forward_invalid_parameter(namespace, pod, from_port, to_port):
     # Arrange
@@ -46,7 +75,7 @@ def test_forward_invalid_parameter(namespace, pod, from_port, to_port):
 
 
 def test_forward_raise_error():
-    """ Tests the conversion of the C extension error into the Python Error """
+    """Tests the conversion of the C extension error into the Python Error"""
 
     # Arrange
     namespace = "test" + str(uuid.uuid4())  # Should never exists
@@ -58,3 +87,15 @@ def test_forward_raise_error():
     with pytest.raises(portforward.PortforwardError):
         with portforward.forward(namespace, pod, from_, to):
             pytest.fail("Should raise error before")
+
+
+def _create_test_resources(kind_cluster: KindCluster):
+    kind_cluster.kubectl("create", "ns", TEST_NAMESPACE)
+
+    for _ in range(0, 100):
+        try:
+            kind_cluster.kubectl("apply", "-f", "tests/resources.yaml")
+            break
+        except:
+            print("Could not yet create resources")
+            time.sleep(1.0)
