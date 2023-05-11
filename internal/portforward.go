@@ -45,19 +45,26 @@ Every space should keep the ownership of its memory allocations.
 Parameters are passed from Python to Go but Go never owns them.
 */
 var (
-	activeForwards = make(map[string]chan struct{})
-	mutex          sync.Mutex
+	activeForwards  = make(map[string]chan struct{})
+	podsForServices = make(map[string]string)
+	mutex           sync.Mutex
 )
 
 // registerForwarding adds a forwarding to the active forwards.
-func registerForwarding(namespace, podOrService string, stopCh chan struct{}) {
-	key := fmt.Sprintf("%s/%s", namespace, podOrService)
+func registerForwarding(namespace, pod, podOrService string, stopCh chan struct{}) {
+	key := fmt.Sprintf("%s/%s", namespace, pod)
 
 	mutex.Lock()
 	defer mutex.Unlock()
 
 	if otherCh, ok := activeForwards[key]; ok {
 		close(otherCh)
+	}
+
+	// When they are not equal then we received a service name.
+	if pod != podOrService {
+		serviceKey := fmt.Sprintf("%s/%s", namespace, podOrService)
+		podsForServices[serviceKey] = pod
 	}
 
 	activeForwards[key] = stopCh
@@ -70,9 +77,25 @@ func StopForwarding(namespace, podOrService string) {
 	mutex.Lock()
 	defer mutex.Unlock()
 
-	if otherCh, ok := activeForwards[key]; ok {
-		close(otherCh)
+	if stopChannel, ok := activeForwards[key]; ok {
+		close(stopChannel)
 		delete(activeForwards, key)
+	}
+
+	// We did not find a stopChannel. Was it maybe a service
+	// and was registered with the actual target pod name?
+
+	serviceKey := fmt.Sprintf("%s/%s", namespace, podOrService)
+
+	if podForService, ok := podsForServices[serviceKey]; ok {
+		key = fmt.Sprintf("%s/%s", namespace, podForService)
+
+		if stopChannel, ok := activeForwards[key]; ok {
+			close(stopChannel)
+			delete(activeForwards, key)
+		}
+
+		delete(podsForServices, serviceKey)
 	}
 }
 
@@ -126,7 +149,7 @@ func Forward(namespace, podOrService string, fromPort, toPort int, configPath st
 	}
 
 	// HANDLE CLOSING
-	registerForwarding(namespace, pod.Name, stopChan)
+	registerForwarding(namespace, pod.Name, podOrService, stopChan)
 	closeOnSigterm(namespace, pod.Name)
 
 	return nil

@@ -5,6 +5,7 @@ History
 unreleased
 ----------
 * Move pytogo Go code into portforward
+* Fix stopping portforward for services
 
 0.4.5 (2023-03-06)
 ------------------

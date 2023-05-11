@@ -13,3 +13,5 @@ mypy==0.971
 pytest==6.2.4
 
 setuptools-golang==2.7.0
+pytest-kind
+pykube
