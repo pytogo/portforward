@@ -235,3 +235,4 @@ modules.xml
 .history
 .ionide
 scripts
+.pytest-kind
