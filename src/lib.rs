@@ -1,3 +1,4 @@
+use pyo3::exceptions::PyRuntimeError;
 use pyo3::prelude::*;
 
 mod portforward;
@@ -25,7 +26,12 @@ fn forward(
         .kube_context(kube_context)
         .build();
 
-    pyo3_asyncio::tokio::future_into_py(py, async { Ok(portforward::forward(config).await) })
+    pyo3_asyncio::tokio::future_into_py(py, async {
+        portforward::forward(config).await.map_err(|e| {
+            let msg = format!("{:?}", e);
+            PyRuntimeError::new_err(msg)
+        })
+    })
 }
 
 /// Stops a connection to a pod.
@@ -33,13 +39,14 @@ fn forward(
 fn stop(
     py: Python<'_>,
     namespace: String,
-    pod_or_service: String,
+    actual_pod: String,
+    to_port: u16,
     log_level: u64,
 ) -> PyResult<&PyAny> {
     init_log(log_level);
 
-    pyo3_asyncio::tokio::future_into_py(py, async {
-        portforward::stop(namespace, pod_or_service).await;
+    pyo3_asyncio::tokio::future_into_py(py, async move {
+        portforward::stop(namespace, actual_pod, to_port).await;
         Ok(Python::with_gil(|py| py.None()))
     })
 }

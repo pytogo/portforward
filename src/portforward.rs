@@ -22,12 +22,9 @@ use tokio::{
 use tokio_stream::wrappers::TcpListenerStream;
 use typed_builder::TypedBuilder;
 
-static OPEN_PORTFORWARDS: Lazy<RwLock<HashMap<String, Sender<()>>>> = Lazy::new(|| {
-    let m = HashMap::new();
-    RwLock::new(m)
-});
+static PORTFORWARD_REGISTRY: Lazy<Registry> = Lazy::new(|| Registry::new());
 
-#[derive(TypedBuilder)]
+#[derive(TypedBuilder, Clone, Debug)]
 pub struct ForwardConfig {
     namespace: String,
     pod_or_service: String,
@@ -39,31 +36,33 @@ pub struct ForwardConfig {
 
 /// Creates a connection to a pod. It returns the actual pod name for the portforward.
 /// It differs from `pod_or_service` when `pod_or_service` represents a service.
-pub async fn forward(config: ForwardConfig) -> String {
-    let q_name = QualifiedName::new(config.namespace, config.pod_or_service);
+pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
+    debug!("{:?}", config);
+
+    let q_name = QualifiedName::new(config.namespace, config.pod_or_service, config.to_port);
     let target_pod = q_name.pod_name.clone();
 
-    let kube_config = kube::config::Kubeconfig::read_from(config.config_path).unwrap();
+    let kube_config = kube::config::Kubeconfig::read_from(config.config_path.clone())?;
     let mut options = kube::config::KubeConfigOptions::default();
     options.context = Some(config.kube_context);
-    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options)
-        .await
-        .unwrap();
-    let client = Client::try_from(client_config).unwrap();
+    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
+    let client = Client::try_from(client_config)?;
     let pods: Api<Pod> = Api::namespaced(client, &q_name.namespace);
 
     let running = await_condition(pods.clone(), &q_name.pod_name, is_pod_running());
-    let _ = tokio::time::timeout(std::time::Duration::from_secs(30), running)
-        .await
-        .unwrap();
+    let _ = tokio::time::timeout(std::time::Duration::from_secs(30), running).await?;
 
     let (tx, rx): (Sender<()>, Receiver<()>) = oneshot::channel();
-    register_forward(&q_name, tx).await;
+
+    let forwarding = Forwarding::builder().cancel_sender(tx).build();
+
+    PORTFORWARD_REGISTRY.register(&q_name, forwarding).await;
 
     let addr = SocketAddr::from(([127, 0, 0, 1], config.from_port));
+    let tcp_listener = TcpListener::bind(addr).await?;
 
     tokio::spawn(async move {
-        let server = TcpListenerStream::new(TcpListener::bind(addr).await.unwrap())
+        let server = TcpListenerStream::new(tcp_listener)
             .take_until(rx)
             .try_for_each(|client_conn| async {
                 let pods = pods.clone();
@@ -84,17 +83,14 @@ pub async fn forward(config: ForwardConfig) -> String {
         }
     });
 
-    return target_pod;
+    return Ok(target_pod);
 }
 
 /// Stops a connection to a pod.
-pub async fn stop(namespace: String, pod_or_service: String) {
-    let q_name = QualifiedName::new(namespace, pod_or_service);
-    let key = q_name.to_string();
+pub async fn stop(namespace: String, actual_pod: String, to_port: u16) {
+    let q_name = QualifiedName::new(namespace, actual_pod, to_port);
 
-    if let Some(tx) = OPEN_PORTFORWARDS.write().await.remove(&key) {
-        tx.send(()).unwrap();
-    }
+    PORTFORWARD_REGISTRY.stop(&q_name).await;
 }
 
 async fn forward_connection(
@@ -115,27 +111,52 @@ async fn forward_connection(
 
 // ===== ===== HELPER ===== =====
 
-struct QualifiedName {
-    namespace: String,
-    pod_name: String,
+#[derive(TypedBuilder)]
+struct Forwarding {
+    cancel_sender: Sender<()>,
 }
 
-impl QualifiedName {
-    fn new(namespace: String, name: String) -> Self {
+struct Registry {
+    register: RwLock<HashMap<QualifiedName, Forwarding>>,
+}
+
+impl Registry {
+    fn new() -> Self {
+        let m = HashMap::new();
         Self {
-            namespace,
-            pod_name: name,
+            register: RwLock::new(m),
         }
     }
 
-    fn to_string(&self) -> String {
-        format!("{}/{}", self.namespace, self.pod_name)
+    async fn register(&self, qualified_name: &QualifiedName, forwarding: Forwarding) {
+        self.register
+            .write()
+            .await
+            .insert(qualified_name.clone(), forwarding);
+    }
+
+    async fn stop(&self, qualified_name: &QualifiedName) {
+        if let Some(forwarding) = self.register.write().await.remove(&qualified_name) {
+            if let Err(_) = forwarding.cancel_sender.send(()) {
+                warn!("Unable to close port-forwarding");
+            }
+        }
     }
 }
 
-async fn register_forward(qualified_name: &QualifiedName, sender: Sender<()>) {
-    OPEN_PORTFORWARDS
-        .write()
-        .await
-        .insert(qualified_name.to_string(), sender);
+#[derive(Eq, PartialEq, Hash, Clone)]
+struct QualifiedName {
+    namespace: String,
+    pod_name: String,
+    target_port: u16,
+}
+
+impl QualifiedName {
+    fn new(namespace: String, name: String, target_port: u16) -> Self {
+        Self {
+            namespace,
+            pod_name: name,
+            target_port,
+        }
+    }
 }

@@ -84,7 +84,6 @@ def forward(
     )
 
     try:
-
         asyncio.run(forwarder.forward())
 
         yield forwarder
@@ -137,7 +136,7 @@ class PortForwarder:
 
     async def stop(self):
         await _portforward.stop(
-            self.namespace, self.actual_pod_name, self.log_level.value
+            self.namespace, self.actual_pod_name, self.to_port, self.log_level.value
         )
 
     def is_stopped(self):
