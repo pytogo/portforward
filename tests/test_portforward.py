@@ -1,19 +1,25 @@
-import sys
-import time
+"""
+Tests for `portforward` package.
 
-from pytest_kind import KindCluster
+!!! It will only test the Python side !!!
+"""
+import time
+from typing import List
+import uuid
+import sys
 
 sys.path.append(".")
 
-import uuid
-
 import pytest
+from pytest_kind import KindCluster
+import requests
+from pykube import Namespace
 
 import portforward
-import requests
 
 
 TEST_NAMESPACE = "pftest"
+TEST_CONTEXT = "kind-pytest-kind"
 
 
 def test_pod_portforward_with_success(kind_cluster: KindCluster):
@@ -24,7 +30,7 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
     pod_name = "nginx"
     local_port = 9000  # from port
     pod_port = 80  # to port
-    context = kind_cluster.name
+    context = TEST_CONTEXT
     config = str(kind_cluster.kubeconfig_path.absolute())
 
     with portforward.forward(
@@ -37,6 +43,37 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
     ):
         response: requests.Response = requests.get("http://localhost:9000")
         assert response.status_code == 200
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        response: requests.Response = requests.get("http://localhost:9000")
+        pytest.fail("Portforward should be closed after leaving the context manager")
+
+
+def test_service_portforward_with_success(kind_cluster: KindCluster):
+    # Arrange
+    _create_test_resources(kind_cluster)
+
+    # Act & Assert
+    service_name = "nginx-service"
+    local_port = 9000  # from port
+    pod_port = 80  # to port
+    context = TEST_CONTEXT
+    config = str(kind_cluster.kubeconfig_path.absolute())
+
+    with portforward.forward(
+        TEST_NAMESPACE,
+        service_name,
+        local_port,
+        pod_port,
+        config_path=config,
+        kube_context=context,
+    ):
+        response: requests.Response = requests.get("http://localhost:9000")
+        assert response.status_code == 200
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        response: requests.Response = requests.get("http://localhost:9000")
+        pytest.fail("Portforward should be closed after leaving the context manager")
 
 
 @pytest.mark.parametrize(
@@ -90,6 +127,12 @@ def test_forward_raise_error():
 
 
 def _create_test_resources(kind_cluster: KindCluster):
+    for namespace in Namespace.objects(kind_cluster.api).filter():
+        # When test namespace already exists then the other resource
+        # should also already exists.
+        if namespace.name == TEST_NAMESPACE:
+            return
+
     kind_cluster.kubectl("create", "ns", TEST_NAMESPACE)
 
     for _ in range(0, 100):
