@@ -22,8 +22,6 @@ use tokio::{
 use tokio_stream::wrappers::TcpListenerStream;
 use typed_builder::TypedBuilder;
 
-static PORTFORWARD_REGISTRY: Lazy<Registry> = Lazy::new(|| Registry::new());
-
 #[derive(TypedBuilder, Clone, Debug)]
 pub struct ForwardConfig {
     namespace: String,
@@ -60,37 +58,39 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
 
     let addr = SocketAddr::from(([127, 0, 0, 1], config.from_port));
     let tcp_listener = TcpListener::bind(addr).await?;
+    let forward_task =
+        setup_forward_task(tcp_listener, rx, pods, config.to_port, target_pod.clone());
 
-    tokio::spawn(async move {
-        let server = TcpListenerStream::new(tcp_listener)
-            .take_until(rx)
-            .try_for_each(|client_conn| async {
-                let pods = pods.clone();
-                let pod_port = config.to_port;
-                let pod_name = q_name.pod_name.clone();
-
-                tokio::spawn(async move {
-                    let forwarding = forward_connection(&pods, &pod_name, pod_port, client_conn);
-                    if let Err(e) = forwarding.await {
-                        error!("failed to forward connection: {}", e);
-                    }
-                });
-                // keep the server running
-                Ok(())
-            });
-        if let Err(e) = server.await {
-            error!("server error: {}", e);
-        }
-    });
+    tokio::spawn(forward_task);
 
     return Ok(target_pod);
 }
 
-/// Stops a connection to a pod.
-pub async fn stop(namespace: String, actual_pod: String, to_port: u16) {
-    let q_name = QualifiedName::new(namespace, actual_pod, to_port);
+async fn setup_forward_task(
+    tcp_listener: TcpListener,
+    rx: Receiver<()>,
+    pods: Api<Pod>,
+    pod_port: u16,
+    pod_name: String,
+) {
+    let server = TcpListenerStream::new(tcp_listener)
+        .take_until(rx)
+        .try_for_each(|client_conn| async {
+            let pods = pods.clone();
+            let pod_name = pod_name.clone();
 
-    PORTFORWARD_REGISTRY.stop(&q_name).await;
+            tokio::spawn(async move {
+                let forwarding = forward_connection(&pods, &pod_name, pod_port, client_conn);
+                if let Err(e) = forwarding.await {
+                    error!("failed to forward connection: {}", e);
+                }
+            });
+            // keep the server running
+            Ok(())
+        });
+    if let Err(e) = server.await {
+        error!("server error: {}", e);
+    }
 }
 
 async fn forward_connection(
@@ -109,7 +109,18 @@ async fn forward_connection(
     Ok(())
 }
 
-// ===== ===== HELPER ===== =====
+/// Stops a connection to a pod.
+pub async fn stop(namespace: String, actual_pod: String, to_port: u16) {
+    let q_name = QualifiedName::new(namespace, actual_pod, to_port);
+
+    PORTFORWARD_REGISTRY.stop(&q_name).await;
+}
+
+// ===== ===== ============ ===== =====
+// ===== ===== REGISTRATION ===== =====
+// ===== ===== ============ ===== =====
+
+static PORTFORWARD_REGISTRY: Lazy<Registry> = Lazy::new(|| Registry::new());
 
 #[derive(TypedBuilder)]
 struct Forwarding {
