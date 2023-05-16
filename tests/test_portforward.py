@@ -27,9 +27,9 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
     _create_test_resources(kind_cluster)
 
     # Act & Assert
-    pod_name = "nginx"
+    pod_name = "test-pod"
     local_port = 9000  # from port
-    pod_port = 80  # to port
+    pod_port = 3000  # to port
     context = TEST_CONTEXT
     config = str(kind_cluster.kubeconfig_path.absolute())
 
@@ -41,11 +41,11 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
         config_path=config,
         kube_context=context,
     ):
-        response: requests.Response = requests.get("http://localhost:9000")
+        response: requests.Response = requests.get("http://localhost:9000/ping")
         assert response.status_code == 200
 
     with pytest.raises(requests.exceptions.ConnectionError):
-        response: requests.Response = requests.get("http://localhost:9000")
+        response: requests.Response = requests.get("http://localhost:9000/ping")
         pytest.fail("Portforward should be closed after leaving the context manager")
 
 
@@ -54,9 +54,9 @@ def test_service_portforward_with_success(kind_cluster: KindCluster):
     _create_test_resources(kind_cluster)
 
     # Act & Assert
-    service_name = "nginx-service"
+    service_name = "test-service"
     local_port = 9000  # from port
-    pod_port = 80  # to port
+    pod_port = 3000  # to port
     context = TEST_CONTEXT
     config = str(kind_cluster.kubeconfig_path.absolute())
 
@@ -68,11 +68,11 @@ def test_service_portforward_with_success(kind_cluster: KindCluster):
         config_path=config,
         kube_context=context,
     ):
-        response: requests.Response = requests.get("http://localhost:9000")
+        response: requests.Response = requests.get("http://localhost:9000/ping")
         assert response.status_code == 200
 
     with pytest.raises(requests.exceptions.ConnectionError):
-        response: requests.Response = requests.get("http://localhost:9000")
+        response: requests.Response = requests.get("http://localhost:9000/ping")
         pytest.fail("Portforward should be closed after leaving the context manager")
 
 
