@@ -6,7 +6,6 @@ __version__ = "0.4.5"
 
 import contextlib
 import os
-import time
 from enum import Enum
 from pathlib import Path
 from typing import Generator, Optional
@@ -54,6 +53,12 @@ def forward(
         >>> import portforward
         >>> with portforward.forward("test", "web-svc", 9000, 80):
         >>>     # Do work
+        >>>
+        >>> # Or without context manager
+        >>>
+        >>> forwarder = portforward.forward("test", "some-pod", 9000, 80)
+        >>> # Do work
+        >>> forwarder.stop()
 
     :param namespace: Target namespace
     :param pod_or_service: Name of target Pod or service
@@ -63,50 +68,86 @@ def forward(
     :param waiting: Delay in seconds
     :param log_level: Level of logging
     :param kube_context: Target kubernetes context (fallback is current context)
-    :return: None
+    :return: forwarder to manual stop the forwarding
     """
 
-    _validate_str("namespace", namespace)
-    _validate_str("pod_or_service", pod_or_service)
-
-    _validate_port("from_port", from_port)
-    _validate_port("to_port", to_port)
-
-    _validate_log(log_level)
-
-    config_path = _config_path(config_path)
-
-    kube_context = kube_context if kube_context else ""
-    _kube_context(kube_context)
+    forwarder = PortForwarder(
+        namespace,
+        pod_or_service,
+        from_port,
+        to_port,
+        config_path,
+        waiting,
+        log_level,
+        kube_context,
+    )
 
     try:
-        _portforward.forward(
-            namespace,
-            pod_or_service,
-            from_port,
-            to_port,
-            config_path,
-            log_level.value,
-            kube_context,
-        )
+        forwarder.forward()
 
-        # Go and the port-forwarding needs some ms to be ready
-        time.sleep(waiting)
-
-        yield None
+        yield forwarder
 
     except RuntimeError as err:
         # Suppress extension exception
         raise PortforwardError(err) from None
 
     finally:
-        _portforward.stop(namespace, pod_or_service)
+        forwarder.stop()
+
+
+class PortForwarder:
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self.namespace: str = _validate_str("namespace", namespace)
+        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
+        self.from_port: int = _validate_port("from_port", from_port)
+        self.to_port: int = _validate_port("to_port", to_port)
+        self.log_level: LogLevel = _validate_log(log_level)
+        self.waiting: float = waiting
+
+        self.config_path: str = _config_path(config_path)
+        self.kube_context: str = kube_context if kube_context else ""
+
+        _kube_context(kube_context)
+
+        self.actual_pod_name: str = ""
+        self._is_stopped: bool = False
+
+    def forward(self):
+        _portforward.forward(
+            self.namespace,
+            self.pod_or_service,
+            self.from_port,
+            self.to_port,
+            self.config_path,
+            self.log_level.value,
+            self.kube_context,
+        )
+
+    def stop(self):
+        _portforward.stop(
+            self.namespace,
+            self.pod_or_service,
+        )
+        self._is_stopped = True
+
+    def is_stopped(self):
+        return self._is_stopped
 
 
 # ===== PRIVATE =====
 
 
-def _validate_str(arg_name, arg):
+def _validate_str(arg_name, arg) -> str:
     if arg is None or not isinstance(arg, str):
         raise ValueError(f"{arg_name}={arg} is not a valid str")
 
@@ -116,16 +157,22 @@ def _validate_str(arg_name, arg):
     if "/" in arg:
         raise ValueError(f"{arg_name} contains illegal character '/'")
 
+    return arg
 
-def _validate_port(arg_name, arg):
+
+def _validate_port(arg_name, arg) -> int:
     in_range = arg and 0 < arg < 65536
     if arg is None or not isinstance(arg, int) or not in_range:
         raise ValueError(f"{arg_name}={arg} is not a valid port")
+
+    return arg
 
 
 def _validate_log(log_level):
     if not isinstance(log_level, LogLevel):
         raise ValueError(f"log_level={log_level} is not a valid LogLevel")
+
+    return log_level
 
 
 def _config_path(config_path_arg) -> str:
