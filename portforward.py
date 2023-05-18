@@ -8,7 +8,7 @@ import contextlib
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Generator, Optional
+from typing import ContextManager, Generator, Optional
 
 import _portforward
 
@@ -25,6 +25,52 @@ class LogLevel(Enum):
     OFF = 4
 
 
+class PortForwarder:
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self.namespace: str = _validate_str("namespace", namespace)
+        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
+        self.from_port: int = _validate_port("from_port", from_port)
+        self.to_port: int = _validate_port("to_port", to_port)
+        self.log_level: LogLevel = _validate_log(log_level)
+        self.waiting: float = waiting
+
+        self.config_path: str = _config_path(config_path)
+        self.kube_context: str = kube_context if kube_context else ""
+
+        _kube_context(kube_context)
+
+        self.actual_pod_name: str = ""
+        self._is_stopped: bool = False
+
+    def forward(self):
+        _portforward.forward(
+            self.namespace,
+            self.pod_or_service,
+            self.from_port,
+            self.to_port,
+            self.config_path,
+            self.log_level.value,
+            self.kube_context,
+        )
+
+    def stop(self):
+        _portforward.stop(self.namespace, self.pod_or_service, self.to_port)
+        self._is_stopped = True
+
+    def is_stopped(self):
+        return self._is_stopped
+
+
 @contextlib.contextmanager
 def forward(
     namespace: str,
@@ -35,7 +81,7 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
-) -> Generator[None, None, None]:
+) -> ContextManager[PortForwarder]:
     """
     Connects to a **pod or service** and tunnels traffic from a local port to this target.
     It uses the kubectl kube config from the home dir if no path is provided.
@@ -93,56 +139,6 @@ def forward(
 
     finally:
         forwarder.stop()
-
-
-class PortForwarder:
-    def __init__(
-        self,
-        namespace: str,
-        pod_or_service: str,
-        from_port: int,
-        to_port: int,
-        config_path: Optional[str] = None,
-        waiting: float = 0.1,
-        log_level: LogLevel = LogLevel.INFO,
-        kube_context: str = "",
-    ) -> None:
-        self.namespace: str = _validate_str("namespace", namespace)
-        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
-        self.from_port: int = _validate_port("from_port", from_port)
-        self.to_port: int = _validate_port("to_port", to_port)
-        self.log_level: LogLevel = _validate_log(log_level)
-        self.waiting: float = waiting
-
-        self.config_path: str = _config_path(config_path)
-        self.kube_context: str = kube_context if kube_context else ""
-
-        _kube_context(kube_context)
-
-        self.actual_pod_name: str = ""
-        self._is_stopped: bool = False
-
-    def forward(self):
-        _portforward.forward(
-            self.namespace,
-            self.pod_or_service,
-            self.from_port,
-            self.to_port,
-            self.config_path,
-            self.log_level.value,
-            self.kube_context,
-        )
-
-    def stop(self):
-        _portforward.stop(
-            self.namespace,
-            self.pod_or_service,
-            self.to_port
-        )
-        self._is_stopped = True
-
-    def is_stopped(self):
-        return self._is_stopped
 
 
 # ===== PRIVATE =====
