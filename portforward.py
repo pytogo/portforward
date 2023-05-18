@@ -137,6 +137,7 @@ class PortForwarder:
         _portforward.stop(
             self.namespace,
             self.pod_or_service,
+            self.to_port
         )
         self._is_stopped = True
 

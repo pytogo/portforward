@@ -2,7 +2,7 @@ package main
 
 // #include <Python.h>
 // int PyArg_ParseTuple_ssiisis(PyObject* args, char** a, char** b, int* c, int* d, char** e, int* f, char** g);
-// int PyArg_ParseTuple_ss(PyObject*, char**, char**);
+// int PyArg_ParseTuple_ssi(PyObject* args, char** a, char** b, int* c);
 // void raise_exception(char *msg);
 import "C"
 
@@ -59,8 +59,9 @@ func stop(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	// https://docs.python.org/3/c-api/arg.html
 	var namespace *C.char
 	var podName *C.char
+	var toPort C.int
 
-	if C.PyArg_ParseTuple_ss(args, &namespace, &podName) == 0 {
+	if C.PyArg_ParseTuple_ssi(args, &namespace, &podName, &toPort) == 0 {
 		C.raise_exception(C.CString("Could not parse args"))
 		return nil
 	}
@@ -68,7 +69,7 @@ func stop(self *C.PyObject, args *C.PyObject) *C.PyObject {
 	var ns string = C.GoString(namespace)
 	var pod string = C.GoString(podName)
 
-	internal.StopForwarding(ns, pod)
+	internal.StopForwarding(ns, pod, int(toPort))
 
 	C.Py_IncRef(C.Py_None)
 	return C.Py_None
