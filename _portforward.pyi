@@ -7,5 +7,5 @@ def forward(namespace: str, pod_or_service: str, from_port: int, to_port: int, c
     pass
 
 
-def stop(namespace: str, pod_or_service: str) -> None:
+def stop(namespace: str, pod_or_service: str, to_port: int) -> None:
     pass

@@ -22,8 +22,8 @@ int PyArg_ParseTuple_ssiisis(PyObject* args, char** a, char** b, int* c, int* d,
     return PyArg_ParseTuple(args, "ssiisis", a, b, c, d, e, f, g);
 }
 
-int PyArg_ParseTuple_ss(PyObject* args, char** a, char** b) {
-    return PyArg_ParseTuple(args, "ss", a, b);
+int PyArg_ParseTuple_ssi(PyObject* args, char** a, char** b, int* c) {
+    return PyArg_ParseTuple(args, "ssi", a, b, c);
 }
 
 static struct PyMethodDef methods[] = {

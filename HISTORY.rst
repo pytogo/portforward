@@ -6,6 +6,8 @@ unreleased
 ----------
 * Move pytogo Go code into portforward
 * Fix stopping portforward for services
+* Allow portforwarding without contextmanager
+* Allow multiple portforwards to same pod or service
 
 0.4.5 (2023-03-06)
 ------------------

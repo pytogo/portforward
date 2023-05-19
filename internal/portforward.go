@@ -51,8 +51,9 @@ var (
 )
 
 // registerForwarding adds a forwarding to the active forwards.
-func registerForwarding(namespace, pod, podOrService string, stopCh chan struct{}) {
-	key := fmt.Sprintf("%s/%s", namespace, pod)
+func registerForwarding(namespace, pod, podOrService string, toPort int, stopCh chan struct{}) {
+	key := fmt.Sprintf("%s/%s/%d", namespace, pod, toPort)
+	debugPortforward(fmt.Sprintf("Register pod key %s", key))
 
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -63,7 +64,8 @@ func registerForwarding(namespace, pod, podOrService string, stopCh chan struct{
 
 	// When they are not equal then we received a service name.
 	if pod != podOrService {
-		serviceKey := fmt.Sprintf("%s/%s", namespace, podOrService)
+		serviceKey := fmt.Sprintf("%s/%s/%d", namespace, podOrService, toPort)
+		debugPortforward(fmt.Sprintf("Register service key %s with %s", serviceKey, pod))
 		podsForServices[serviceKey] = pod
 	}
 
@@ -71,8 +73,9 @@ func registerForwarding(namespace, pod, podOrService string, stopCh chan struct{
 }
 
 // StopForwarding closes a port forwarding.
-func StopForwarding(namespace, podOrService string) {
-	key := fmt.Sprintf("%s/%s", namespace, podOrService)
+func StopForwarding(namespace, podOrService string, toPort int) {
+	key := fmt.Sprintf("%s/%s/%d", namespace, podOrService, toPort)
+	debugPortforward(fmt.Sprintf("Look up pod key %s", key))
 
 	mutex.Lock()
 	defer mutex.Unlock()
@@ -80,19 +83,23 @@ func StopForwarding(namespace, podOrService string) {
 	if stopChannel, ok := activeForwards[key]; ok {
 		close(stopChannel)
 		delete(activeForwards, key)
+		debugPortforward(fmt.Sprintf("Stopped forward for key %s", key))
 	}
 
 	// We did not find a stopChannel. Was it maybe a service
 	// and was registered with the actual target pod name?
 
-	serviceKey := fmt.Sprintf("%s/%s", namespace, podOrService)
+	serviceKey := fmt.Sprintf("%s/%s/%d", namespace, podOrService, toPort)
+	debugPortforward(fmt.Sprintf("Look up service key %s", serviceKey))
 
 	if podForService, ok := podsForServices[serviceKey]; ok {
-		key = fmt.Sprintf("%s/%s", namespace, podForService)
+		key = fmt.Sprintf("%s/%s/%d", namespace, podForService, toPort)
+		debugPortforward(fmt.Sprintf("Look up pod key %s", key))
 
 		if stopChannel, ok := activeForwards[key]; ok {
 			close(stopChannel)
 			delete(activeForwards, key)
+			debugPortforward(fmt.Sprintf("Stopped forward for key %s", key))
 		}
 
 		delete(podsForServices, serviceKey)
@@ -149,8 +156,8 @@ func Forward(namespace, podOrService string, fromPort, toPort int, configPath st
 	}
 
 	// HANDLE CLOSING
-	registerForwarding(namespace, pod.Name, podOrService, stopChan)
-	closeOnSigterm(namespace, pod.Name)
+	registerForwarding(namespace, pod.Name, podOrService, toPort, stopChan)
+	closeOnSigterm(namespace, pod.Name, toPort)
 
 	return nil
 }
@@ -364,7 +371,7 @@ func startForward(dialer httpstream.Dialer, ports string, stopChan, readyChan ch
 }
 
 // closeOnSigterm cares about closing a channel when the OS sends a SIGTERM.
-func closeOnSigterm(namespace, qualifiedName string) {
+func closeOnSigterm(namespace, qualifiedName string, toPort int) {
 	sigs := make(chan os.Signal, 1)
 
 	signal.Notify(sigs, syscall.SIGINT, syscall.SIGTERM)
@@ -373,7 +380,7 @@ func closeOnSigterm(namespace, qualifiedName string) {
 		// Received kill signal
 		<-sigs
 
-		StopForwarding(namespace, qualifiedName)
+		StopForwarding(namespace, qualifiedName, toPort)
 	}()
 }
 
