@@ -8,7 +8,7 @@ import contextlib
 import os
 from enum import Enum
 from pathlib import Path
-from typing import ContextManager, Generator, Optional
+from typing import Iterator, Optional
 
 import _portforward
 
@@ -81,7 +81,7 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
-) -> ContextManager[PortForwarder]:
+) -> Iterator[PortForwarder]:
     """
     Connects to a **pod or service** and tunnels traffic from a local port to this target.
     It uses the kubectl kube config from the home dir if no path is provided.
