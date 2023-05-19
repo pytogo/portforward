@@ -2,8 +2,8 @@
 History
 =======
 
-unreleased
-----------
+0.5.0 (2023-05-19)
+------------------
 * Move pytogo Go code into portforward
 * Fix stopping portforward for services
 * Allow portforwarding without contextmanager

@@ -1,5 +1,5 @@
-portforward
-===========
+portforward-go
+==============
 
 .. toctree::
    :maxdepth: 4
