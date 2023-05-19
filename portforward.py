@@ -62,6 +62,7 @@ class PortForwarder:
             self.log_level.value,
             self.kube_context,
         )
+        self._is_stopped = True
 
     def stop(self):
         _portforward.stop(self.namespace, self.pod_or_service, self.to_port)
@@ -83,8 +84,9 @@ def forward(
     kube_context: str = "",
 ) -> Iterator[PortForwarder]:
     """
-    Connects to a **pod or service** and tunnels traffic from a local port to this target.
-    It uses the kubectl kube config from the home dir if no path is provided.
+    Connects to a **pod or service** and tunnels traffic from a local port to
+    this target. It uses the kubectl kube config from the home dir if no path
+    is provided.
 
     The libary will figure out for you if it has to target a pod or service.
 
