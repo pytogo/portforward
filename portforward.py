@@ -62,7 +62,7 @@ class PortForwarder:
             self.log_level.value,
             self.kube_context,
         )
-        self._is_stopped = True
+        self._is_stopped = False
 
     def stop(self):
         _portforward.stop(self.namespace, self.pod_or_service, self.to_port)
