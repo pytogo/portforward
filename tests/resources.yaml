@@ -29,15 +29,15 @@ spec:
     selector:
         app.kubernetes.io/name: portforwarding-test-tar
     ports:
-        - name: name-of-service-port
+        - name: name-of-service-port-1
           protocol: TCP
           port: 3000
           targetPort: http-web-svc-1
-        - name: name-of-service-port
+        - name: name-of-service-port-2
           protocol: TCP
           port: 3001
           targetPort: http-web-svc-2
-        - name: name-of-service-port
+        - name: name-of-service-port-3
           protocol: TCP
           port: 3002
           targetPort: http-web-svc-3

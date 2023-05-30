@@ -26,26 +26,53 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
     # Arrange
     _create_test_resources(kind_cluster)
 
-    # Act & Assert
     pod_name = "test-pod"
-    local_port = 9000  # from port
-    pod_port = 3000  # to port
-    context = TEST_CONTEXT
     config = str(kind_cluster.kubeconfig_path.absolute())
 
-    with portforward.forward(
+    local_port_1 = 9000  # from port
+    pod_port_1 = 3000  # to port
+    url_1 = f"http://localhost:{local_port_1}/ping"
+
+    pf_1 = portforward.forward(
         TEST_NAMESPACE,
         pod_name,
-        local_port,
-        pod_port,
+        local_port_1,
+        pod_port_1,
         config_path=config,
-        kube_context=context,
-    ):
-        response: requests.Response = requests.get("http://localhost:9000/ping")
+        kube_context=TEST_CONTEXT,
+    )
+
+    local_port_2 = 9001  # from port
+    pod_port_2 = 3001  # to port
+    url_2 = f"http://localhost:{local_port_2}/ping"
+
+    pf_2 = portforward.forward(
+        TEST_NAMESPACE,
+        pod_name,
+        local_port_2,
+        pod_port_2,
+        config_path=config,
+        kube_context=TEST_CONTEXT,
+    )
+
+    # Act & Assert
+    with pf_1 as forwarder_1, pf_2 as forwarder_2:
+        assert not forwarder_1.is_stopped
+        response: requests.Response = requests.get(url_1)
         assert response.status_code == 200
 
+        assert not forwarder_2.is_stopped
+        response: requests.Response = requests.get(url_2)
+        assert response.status_code == 200
+
+    assert forwarder_1.is_stopped
     with pytest.raises(requests.exceptions.ConnectionError):
-        response: requests.Response = requests.get("http://localhost:9000/ping")
+        response: requests.Response = requests.get(url_1)
+        pytest.fail("Portforward should be closed after leaving the context manager")
+
+    assert forwarder_2.is_stopped
+    with pytest.raises(requests.exceptions.ConnectionError):
+        response: requests.Response = requests.get(url_2)
         pytest.fail("Portforward should be closed after leaving the context manager")
 
 
@@ -55,24 +82,48 @@ def test_service_portforward_with_success(kind_cluster: KindCluster):
 
     # Act & Assert
     service_name = "test-service"
-    local_port = 9000  # from port
-    pod_port = 3000  # to port
-    context = TEST_CONTEXT
     config = str(kind_cluster.kubeconfig_path.absolute())
 
-    with portforward.forward(
+    local_port_1 = 9000  # from port
+    pod_port_1 = 3000  # to port
+    url_1 = f"http://localhost:{local_port_1}/ping"
+
+    pf_1 = portforward.forward(
         TEST_NAMESPACE,
         service_name,
-        local_port,
-        pod_port,
+        local_port_1,
+        pod_port_1,
         config_path=config,
-        kube_context=context,
-    ):
-        response: requests.Response = requests.get("http://localhost:9000/ping")
+        kube_context=TEST_CONTEXT,
+    )
+
+    local_port_2 = 9001  # from port
+    pod_port_2 = 3001  # to port
+    url_2 = f"http://localhost:{local_port_2}/ping"
+
+    pf_2 = portforward.forward(
+        TEST_NAMESPACE,
+        service_name,
+        local_port_2,
+        pod_port_2,
+        config_path=config,
+        kube_context=TEST_CONTEXT,
+    )
+
+    # Act & Assert
+    with pf_1, pf_2:
+        response: requests.Response = requests.get(url_1)
+        assert response.status_code == 200
+
+        response: requests.Response = requests.get(url_2)
         assert response.status_code == 200
 
     with pytest.raises(requests.exceptions.ConnectionError):
-        response: requests.Response = requests.get("http://localhost:9000/ping")
+        response: requests.Response = requests.get(url_1)
+        pytest.fail("Portforward should be closed after leaving the context manager")
+
+    with pytest.raises(requests.exceptions.ConnectionError):
+        response: requests.Response = requests.get(url_2)
         pytest.fail("Portforward should be closed after leaving the context manager")
 
 
