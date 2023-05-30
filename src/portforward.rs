@@ -11,8 +11,8 @@ use kube::{
 };
 use log::*;
 use once_cell::sync::Lazy;
-use std::collections::HashMap;
 use std::net::SocketAddr;
+use std::{collections::HashMap, path::Path};
 use tokio::{
     io::{AsyncRead, AsyncWrite},
     net::TcpListener,
@@ -40,10 +40,7 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
     let q_name = QualifiedName::new(config.namespace, config.pod_or_service, config.to_port);
     let target_pod = q_name.pod_name.clone();
 
-    let kube_config = kube::config::Kubeconfig::read_from(config.config_path.clone())?;
-    let mut options = kube::config::KubeConfigOptions::default();
-    options.context = Some(config.kube_context);
-    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
+    let client_config = load_config(&config.config_path, &config.kube_context).await?;
     let client = Client::try_from(client_config)?;
     let pods: Api<Pod> = Api::namespaced(client, &q_name.namespace);
 
@@ -64,6 +61,24 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
     tokio::spawn(forward_task);
 
     return Ok(target_pod);
+}
+
+async fn load_config(
+    config_path: &str,
+    kube_context: &str,
+) -> anyhow::Result<kube::config::Config> {
+    // When no config file exists we assume that we should use incluster config.
+    if !Path::new(config_path).exists() {
+        let incluster_config = kube::config::Config::incluster()?;
+        return Ok(incluster_config);
+    }
+
+    let kube_config = kube::config::Kubeconfig::read_from(config_path.clone())?;
+    let mut options = kube::config::KubeConfigOptions::default();
+    options.context = Some(kube_context.to_string());
+    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
+
+    Ok(client_config)
 }
 
 async fn setup_forward_task(
