@@ -123,10 +123,14 @@ release-test-macos: clean ## package and upload a release to test.pypi
 	python3.9 -m twine upload --repository testpypi dist/*
 
 release-macos: clean ## package and upload a release for MacOS
+	python3.11 -m pip install -requirements-dev.txt
+	python3.10 -m pip install -requirements-dev.txt
+	python3.9 -m pip install -requirements-dev.txt
+	python3.8 -m pip install -requirements-dev.txt
+	python3.7 -m pip install -requirements-dev.txt
 	python3.11 setup.py bdist_wheel
 	python3.10 setup.py bdist_wheel
 	python3.9 setup.py bdist_wheel
 	python3.8 setup.py bdist_wheel
 	python3.7 setup.py bdist_wheel
-	python3.6 setup.py bdist_wheel
 	python3.9 -m twine upload dist/*
