@@ -75,7 +75,12 @@ async fn load_config(
 
     let kube_config = kube::config::Kubeconfig::read_from(config_path.clone())?;
     let mut options = kube::config::KubeConfigOptions::default();
-    options.context = Some(kube_context.to_string());
+
+    // "" is the sign for using default context
+    if kube_context != "" {
+        options.context = Some(kube_context.to_string());
+    }
+
     let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
 
     Ok(client_config)

@@ -116,9 +116,7 @@ class PortForwarder:
         self.waiting: float = waiting
 
         self.config_path: str = _config_path(config_path)
-        self.kube_context: str = kube_context if kube_context else ""
-
-        _kube_context(kube_context)
+        self.kube_context: str = _kube_context(kube_context)
 
         self.actual_pod_name: str = ""
         self._is_stopped: bool = False
@@ -191,9 +189,12 @@ def _config_path(config_path_arg) -> str:
     return config_path if os.path.isfile(config_path) else ""
 
 
-def _kube_context(arg):
-    if arg is None or not isinstance(arg, str):
-        raise ValueError(f"kube_context={arg} is not a valid str")
+def _kube_context(context):
+    if not context:
+        return ""
 
-    if "/" in arg:
+    if not isinstance(context, str):
+        raise ValueError(f"kube_context={context} is not a valid str")
+
+    if "/" in context:
         raise ValueError(f"kube_context contains illegal character '/'")
