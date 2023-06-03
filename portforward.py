@@ -84,7 +84,6 @@ def forward(
     )
 
     try:
-
         asyncio.run(forwarder.forward())
 
         yield forwarder
@@ -122,7 +121,7 @@ class PortForwarder:
         _kube_context(kube_context)
 
         self.actual_pod_name: str = ""
-        self.is_stopped: bool = False
+        self._is_stopped: bool = False
 
     async def forward(self):
         self.actual_pod_name = await _portforward.forward(
@@ -134,14 +133,17 @@ class PortForwarder:
             self.log_level.value,
             self.kube_context,
         )
+        self._is_stopped = False
 
     async def stop(self):
         await _portforward.stop(
-            self.namespace, self.actual_pod_name, self.log_level.value
+            self.namespace, self.actual_pod_name, self.to_port, self.log_level.value
         )
+        self._is_stopped = True
 
+    @property
     def is_stopped(self):
-        return self.is_stopped
+        return self._is_stopped
 
 
 # ===== PRIVATE =====

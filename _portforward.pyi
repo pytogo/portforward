@@ -13,5 +13,5 @@ async def forward(
 ) -> None:
     pass
 
-async def stop(namespace: str, pod_or_service: str, log_level: int) -> None:
+async def stop(namespace: str, actual_pod: str, to_port: int, log_level: int) -> None:
     pass

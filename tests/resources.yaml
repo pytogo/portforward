@@ -1,27 +1,43 @@
 apiVersion: v1
 kind: Pod
 metadata:
-  name: nginx
-  labels:
-    app.kubernetes.io/name: proxy
+    name: test-pod
+    namespace: pftest
+    labels:
+        app.kubernetes.io/name: portforwarding-test-tar
 spec:
-  containers:
-    - name: nginx
-      image: nginx:stable
-      ports:
-        - containerPort: 80
-          name: http-web-svc
-
+    containers:
+        - name: portforwarding-test
+          image: corka149/portforwarding-test
+          env:
+              - name: NUM_WORKER
+                value: "3"
+          ports:
+              - containerPort: 3000
+                name: http-web-svc-1
+              - containerPort: 3001
+                name: http-web-svc-2
+              - containerPort: 3002
+                name: http-web-svc-3
 ---
 apiVersion: v1
 kind: Service
 metadata:
-  name: nginx-service
+    name: test-service
+    namespace: pftest
 spec:
-  selector:
-    app.kubernetes.io/name: proxy
-  ports:
-    - name: name-of-service-port
-      protocol: TCP
-      port: 80
-      targetPort: http-web-svc
+    selector:
+        app.kubernetes.io/name: portforwarding-test-tar
+    ports:
+        - name: name-of-service-port-1
+          protocol: TCP
+          port: 3000
+          targetPort: http-web-svc-1
+        - name: name-of-service-port-2
+          protocol: TCP
+          port: 3001
+          targetPort: http-web-svc-2
+        - name: name-of-service-port-3
+          protocol: TCP
+          port: 3002
+          targetPort: http-web-svc-3
