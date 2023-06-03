@@ -198,3 +198,5 @@ def _kube_context(context):
 
     if "/" in context:
         raise ValueError(f"kube_context contains illegal character '/'")
+
+    return context
