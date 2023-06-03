@@ -1,10 +1,9 @@
 import sys
+import time
+
 sys.path.append(".")
 
 import uuid
-import sys
-
-sys.path.append(".")
 
 import pytest
 from pytest_kind import KindCluster
