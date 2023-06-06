@@ -1,5 +1,5 @@
 """
-Kubernetes Port-Forward Go-Edition For Python
+Easy Kubernetes Port-Forward For Python
 """
 
 __version__ = "0.4.5"
@@ -45,9 +45,6 @@ def forward(
 
     It will fall back to in-cluster-config in case no kube config file exists.
 
-    Caution: Go and the port-forwarding needs some ms to be ready. ``waiting``
-    can be used to wait until the port-forward is ready.
-
     (Best consumed as context manager.)
 
     Example:
@@ -84,7 +81,7 @@ def forward(
     )
 
     try:
-        asyncio.run(forwarder.forward())
+        forwarder.forward()
 
         yield forwarder
 
@@ -93,10 +90,48 @@ def forward(
         raise PortforwardError(err) from None
 
     finally:
-        asyncio.run(forwarder.stop())
+        forwarder.stop()
 
 
 class PortForwarder:
+    """Use the same args as the `portforward.forward` method."""
+
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self._async_forwarder = AsyncPortForwarder(
+            namespace,
+            pod_or_service,
+            from_port,
+            to_port,
+            config_path,
+            waiting,
+            log_level,
+            kube_context,
+        )
+
+    def forward(self):
+        asyncio.run(self._async_forwarder.forward())
+
+    def stop(self):
+        asyncio.run(self._async_forwarder.stop())
+
+    @property
+    def is_stopped(self):
+        return self._async_forwarder.is_stopped
+
+
+class AsyncPortForwarder:
+    """Use the same args as the `portforward.forward` method."""
+
     def __init__(
         self,
         namespace: str,
