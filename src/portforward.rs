@@ -1,11 +1,12 @@
 //! portforwards contains the "nice" Rust API.
 //! It is based on [kube-rs examples](https://github.com/kube-rs/kube/blob/33ba90e0a003c915801bb9b6c4961b7d0b721889/examples/pod_portforward_bind.rs).
 
+use anyhow::anyhow;
 use anyhow::Context;
 use futures::{StreamExt, TryStreamExt};
-use k8s_openapi::api::core::v1::Pod;
+use k8s_openapi::api::core::v1::{Pod, Service, ServiceSpec};
 use kube::{
-    api::Api,
+    api::{Api, ListParams},
     runtime::wait::{await_condition, conditions::is_pod_running},
     Client,
 };
@@ -37,13 +38,14 @@ pub struct ForwardConfig {
 pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
     debug!("{:?}", config);
 
-    let q_name = QualifiedName::new(config.namespace, config.pod_or_service, config.to_port);
-    let target_pod = q_name.pod_name.clone();
-
     let client_config = load_config(&config.config_path, &config.kube_context).await?;
     let client = Client::try_from(client_config)?;
-    let pods: Api<Pod> = Api::namespaced(client, &q_name.namespace);
 
+    let target_pod = find_pod(&client, &config.namespace, &config.pod_or_service).await?;
+
+    let q_name: QualifiedName = QualifiedName::new(&config.namespace, &target_pod, config.to_port);
+
+    let pods: Api<Pod> = Api::namespaced(client, &config.namespace);
     let running = await_condition(pods.clone(), &q_name.pod_name, is_pod_running());
     let _ = tokio::time::timeout(std::time::Duration::from_secs(30), running).await?;
 
@@ -55,12 +57,17 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
 
     let addr = SocketAddr::from(([127, 0, 0, 1], config.from_port));
     let tcp_listener = TcpListener::bind(addr).await?;
-    let forward_task =
-        setup_forward_task(tcp_listener, rx, pods, config.to_port, target_pod.clone());
+    let forward_task = setup_forward_task(
+        tcp_listener,
+        rx,
+        pods,
+        config.to_port,
+        q_name.pod_name.clone(),
+    );
 
     tokio::spawn(forward_task);
 
-    return Ok(target_pod);
+    return Ok(q_name.pod_name);
 }
 
 async fn load_config(
@@ -84,6 +91,56 @@ async fn load_config(
     let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
 
     Ok(client_config)
+}
+
+/// Tries to find a pod by the given or name or checks if it is a service
+/// and if a pod matches the selector of the service.
+///
+/// It will return the first thing that it can find.
+async fn find_pod(
+    client: &Client,
+    namespace: &str,
+    pod_or_service: &str,
+) -> anyhow::Result<String> {
+    let pods: Api<Pod> = Api::namespaced(client.clone(), namespace);
+
+    if let Some(_) = pods.get_opt(pod_or_service).await? {
+        return Ok(pod_or_service.to_string());
+    }
+
+    let services: Api<Service> = Api::namespaced(client.clone(), namespace);
+
+    let service = services.get(pod_or_service).await?;
+    let selector = service
+        .spec
+        .and_then(to_label_selector)
+        .ok_or_else(|| anyhow!("No selector could be found for service {}", pod_or_service))?;
+
+    let lp = ListParams::default().labels(&selector);
+
+    let pods_for_svc = pods.list(&lp).await?;
+
+    for pod in pods_for_svc {
+        if let Some(name) = pod.metadata.name {
+            return Ok(name);
+        }
+    }
+
+    Err(anyhow!(
+        "No pod could be found for service {}",
+        pod_or_service
+    ))
+}
+
+fn to_label_selector(service_spec: ServiceSpec) -> Option<String> {
+    let selector = service_spec.selector?;
+    let selector = selector
+        .iter()
+        .map(|(key, val)| format!("{key}={val}"))
+        .collect::<Vec<String>>()
+        .join(",");
+
+    Some(selector)
 }
 
 async fn setup_forward_task(
@@ -131,7 +188,7 @@ async fn forward_connection(
 
 /// Stops a connection to a pod.
 pub async fn stop(namespace: String, actual_pod: String, to_port: u16) {
-    let q_name = QualifiedName::new(namespace, actual_pod, to_port);
+    let q_name = QualifiedName::new(&namespace, &actual_pod, to_port);
 
     PORTFORWARD_REGISTRY.stop(&q_name).await;
 }
@@ -183,10 +240,10 @@ struct QualifiedName {
 }
 
 impl QualifiedName {
-    fn new(namespace: String, name: String, target_port: u16) -> Self {
+    fn new(namespace: &str, name: &str, target_port: u16) -> Self {
         Self {
-            namespace,
-            pod_name: name,
+            namespace: namespace.to_string(),
+            pod_name: name.to_string(),
             target_port,
         }
     }
