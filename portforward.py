@@ -36,10 +36,11 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
-) -> Generator[None, None, None]:
+) -> Generator["PortForwarder", None, None]:
     """
-    Connects to a **pod or service** and tunnels traffic from a local port to this target.
-    It uses the kubectl kube config from the home dir if no path is provided.
+    Connects to a **pod or service** and tunnels traffic from a local port to
+    this target. It uses the kubectl kube config from the home dir if no path
+    is provided.
 
     The libary will figure out for you if it has to target a pod or service.
 
@@ -232,6 +233,6 @@ def _kube_context(context):
         raise ValueError(f"kube_context={context} is not a valid str")
 
     if "/" in context:
-        raise ValueError(f"kube_context contains illegal character '/'")
+        raise ValueError("kube_context contains illegal character '/'")
 
     return context

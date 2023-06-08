@@ -7,3 +7,5 @@ pykube
 bump-my-version
 Sphinx
 twine
+flake8
+mypy
