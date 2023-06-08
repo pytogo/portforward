@@ -31,6 +31,7 @@ clean: clean-build clean-pyc clean-test ## remove all build, test, coverage and 
 clean-build: ## remove build artifacts
 	rm -fr build/
 	rm -fr dist/
+	rm -fr target/
 	rm -fr .eggs/
 	find . -name '*.egg-info' -exec rm -rf {} +
 	find . -name '*.egg' -exec rm -rf {} +
@@ -58,6 +59,35 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-release-linux: ## creates and release linux wheels
-	docker run --rm -v $(pwd):/io ghcr.io/pyo3/maturin build --release
+release-linux: clean ## creates and release linux wheels
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.7
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.8
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.9
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.10
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.11
 
+	twine upload target/wheels/*
+
+release-macos: clean ## creates and release macos wheels
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.7
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.8
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.9
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.10
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.11
+
+	maturin build --release -i python3.7
+	maturin build --release -i python3.8
+	maturin build --release -i python3.9
+	maturin build --release -i python3.10
+	maturin build --release -i python3.11
+
+	twine upload target/wheels/*
+
+release-windows: clean ## creates and release window wheels
+	maturin build --release -i python37
+	maturin build --release -i python38
+	maturin build --release -i python39
+	maturin build --release -i python310
+	maturin build --release -i python311
+
+	twine upload target/wheels/*

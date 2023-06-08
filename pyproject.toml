@@ -30,8 +30,6 @@ Documentation = "https://portforward.readthedocs.io"
 Repository = "https://github.com/pytogo/portforward.git"
 Changelog = "https://github.com/pytogo/portforward/blob/main/HISTORY.rst"
 
-dependencies = []
-
 [tool.maturin]
 features = ["pyo3/extension-module"]
 

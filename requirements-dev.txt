@@ -6,3 +6,4 @@ requests
 pykube
 bump-my-version
 Sphinx
+twine
