@@ -5,12 +5,30 @@ build-backend = "maturin"
 [project]
 name = "portforward"
 version = "0.5.0"
+authors = [
+  { name="Sebastian Ziemann", email="corka149@mailbox.org" },
+]
+description = "Easy Kubernetes Port-Forward For Python"
+readme = "README.rst"
 requires-python = ">=3.7"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.7",
+    "Programming Language :: Python :: 3.8",
+    "Programming Language :: Python :: 3.9",
+    "Programming Language :: Python :: 3.10",
+    "Programming Language :: Python :: 3.11",
 ]
+license = {text = "MIT License"}
+keywords = ["portforward", "kubernetes", "k8s"]
+
+[project.urls]
+Documentation = "https://portforward.readthedocs.io"
+Repository = "https://github.com/pytogo/portforward.git"
+Changelog = "https://github.com/pytogo/portforward/blob/main/HISTORY.rst"
 
 dependencies = []
 
