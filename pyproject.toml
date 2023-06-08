@@ -16,3 +16,12 @@ dependencies = []
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+
+[tool.bumpversion]
+current_version = "0.5.0"
+
+[[tool.bumpversion.files]]
+filename = "portforward.py"
+
+[[tool.bumpversion.files]]
+filename = "Cargo.toml"

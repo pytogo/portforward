@@ -4,3 +4,4 @@ pytest
 pytest-kind
 requests
 pykube
+bump-my-version
