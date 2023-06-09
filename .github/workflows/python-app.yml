@@ -33,7 +33,7 @@ jobs:
               run: |
                   python -m pip install --upgrade pip
                   pip install -r requirements-dev.txt
-                  maturin build
+                  maturin develop
             # Format
             - name: Check format
               run: black --check portforward.py
