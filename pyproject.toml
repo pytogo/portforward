@@ -32,6 +32,8 @@ Changelog = "https://github.com/pytogo/portforward/blob/main/HISTORY.rst"
 
 [tool.maturin]
 features = ["pyo3/extension-module"]
+module-name = "portforward._portforward"
+python-source = "python"
 
 [tool.bumpversion]
 current_version = "0.5.0"

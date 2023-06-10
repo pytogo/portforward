@@ -11,7 +11,7 @@ from enum import Enum
 from pathlib import Path
 from typing import Generator, Optional
 
-import _portforward
+from portforward import _portforward
 
 
 class PortforwardError(Exception):
