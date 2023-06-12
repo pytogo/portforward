@@ -28,10 +28,7 @@ From sources
 
 The sources for portforward can be downloaded from the `Github repo`_.
 
-External requirements of this project:
-
-* Golang
-* gcc
+Rust with cargo are the only external requirements of this project
 
 You can either clone the public repository:
 
@@ -49,7 +46,7 @@ Once you have a copy of the source and the external dependencies ready, you can 
 
 .. code-block:: console
 
-    $ python setup.py install
+    $ maturin develop
 
 
 .. _Github repo: https://github.com/pytogo/portforward

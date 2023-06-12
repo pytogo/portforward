@@ -2,9 +2,17 @@
 History
 =======
 
-unreleased
-----------
+0.6.0 (2023-06-13)
+------------------
+* Rewrite native part in Rust with support of Py03 and maturin
+* Add async client
+
+0.5.0 (2023-05-19)
+------------------
 * Move pytogo Go code into portforward
+* Fix stopping portforward for services
+* Allow portforwarding without contextmanager
+* Allow multiple portforwards to same pod or service
 
 0.4.5 (2023-03-06)
 ------------------

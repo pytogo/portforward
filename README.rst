@@ -22,7 +22,7 @@ portforward
 
 
 
-Kubernetes Port-Forward Go-Edition For Python
+Easy Kubernetes Port-Forward For Python
 
 
 * Free software: MIT license
@@ -40,7 +40,6 @@ Wheels are available for:
 
 with Python versions:
 
-* 3.6
 * 3.7
 * 3.8
 * 3.9
@@ -56,9 +55,8 @@ and architectures:
 
 The following things are required when there is no wheel available for the target system.
 
-* `Go` installed and available in the path (at least v1.16 / https://go.dev)
-* `Python` (at least v3.6 - below was never tested but might work)
-* `gcc` (for Windows available via MinGW)
+* `Rust` installed and available in the path (https://www.rust-lang.org/tools/install)
+* `Python` (at least v3.7 - below was never tested but might work)
 
 Pip knows how to install ``portforward``.
 
@@ -96,11 +94,13 @@ Quickstart
 Features
 --------
 
-* Go native Kubernetes port-forwarding with the ``.kube/config`` from the home dir
+* Native Kubernetes port-forwarding with the ``.kube/config`` from the home dir
   or any other path to config.
 * Portforward for pods and services - the lib will first look for a pod with matching name then for
   a service
 * Waiting for a pod to become ready
+* Multiple forwards per pod or service
+* As context manager, sync or async client
 
 
 Development
@@ -111,11 +111,6 @@ In case you want to develop on this library itself please take a look at the CON
 Credits
 -------
 
-This package was created with Cookiecutter_ and the `audreyr/cookiecutter-pypackage`_ project template.
+This project is enabled by PyO3_.
 
-.. _Cookiecutter: https://github.com/audreyr/cookiecutter
-.. _`audreyr/cookiecutter-pypackage`: https://github.com/audreyr/cookiecutter-pypackage
-
-This project is enabled by setuptools-golang_.
-
-.. _setuptools-golang: https://github.com/asottile/setuptools-golang
+.. _PyO3: https://pyo3.rs
