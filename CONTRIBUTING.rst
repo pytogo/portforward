@@ -15,9 +15,8 @@ Types of Contributions
 Open question / ToDo's
 ~~~~~~~~~~~~~~~~~~~~~~
 
-* Add tests
-* Check need of memory deallocation
-* Automate building and releasing
+* Add tests (more tests are always good)
+* Better docs
 
 Report Bugs
 ~~~~~~~~~~~
@@ -69,24 +68,16 @@ Ready to contribute? Here's how to set up `portforward` for local development.
 
 Requirements of this project:
 
-* Golang
-* gcc
+* Rust
+* k3s for unit tests
 * Python dependencies in requirement-dev.txt
 
-This project uses setuptools-golang_. It will be install through ``pip`` with
-the requirements-dev.txt. The following additional lines in the ``setup.py``
-activates the compiling:
+This project uses PyO3_. It will be install through ``pip`` with
+the requirements-dev.txt. Maturin_ takes care of building the Rust
+code as Python module.
 
-.. _setuptools-golang: https://github.com/asottile/setuptools-golang
-
-.. code-block:: Python
-
-    ext_modules=[
-        Extension(
-            "portforward", ["main.go"],
-            py_limited_api=True, define_macros=[('Py_LIMITED_API', None)],
-        )
-    ]
+.. _PyO3: https://pyo3.rs
+.. _Maturin: https://www.maturin.rs/index.html
 
 
 1. Fork the `portforward` repo on GitHub.
@@ -98,7 +89,7 @@ activates the compiling:
 
     $ mkvirtualenv portforward
     $ cd portforward/
-    $ python setup.py install
+    $ maturin develop
 
 4. Create a branch for local development::
 
@@ -142,6 +133,6 @@ A reminder for the maintainers on how to deploy.
 Make sure all your changes are committed (including an entry in HISTORY.rst).
 Then run::
 
-$ bump2version patch # possible: major / minor / patch
+$ bump-my-version patch # possible: major / minor / patch
 $ git push
 $ git push --tags
