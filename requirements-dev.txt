@@ -6,7 +6,7 @@ flake8==3.7.8
 tox==3.14.0
 coverage==4.5.4
 Sphinx
-twine==1.14.0
+twine
 black==22.6.0
 mypy==0.971
 
