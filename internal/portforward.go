@@ -308,7 +308,7 @@ func newDialer(config *rest.Config, namespace string, pod *v1.Pod) (httpstream.D
 	}
 
 	path := fmt.Sprintf("/api/v1/namespaces/%s/pods/%s/portforward", namespace, pod.Name)
-	hostIP := strings.TrimLeft(config.Host, "https://")
+	hostIP := strings.TrimPrefix(config.Host, "https://")
 
 	// When there is a "/" in the hostIP, it contains also a path
 	if parts := strings.SplitN(hostIP, "/", 2); len(parts) == 2 {
