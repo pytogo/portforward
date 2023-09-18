@@ -175,7 +175,6 @@ class AsyncPortForwarder:
         )
         self._is_stopped = True
 
-    @property
     def is_stopped(self):
         return self._is_stopped
 

@@ -55,20 +55,20 @@ def test_pod_portforward_with_success(kind_cluster: KindCluster):
 
     # Act & Assert
     with pf_1 as forwarder_1, pf_2 as forwarder_2:
-        assert not forwarder_1.is_stopped
+        assert not forwarder_1.is_stopped()
         response: requests.Response = requests.get(url_1)
         assert response.status_code == 200
 
-        assert not forwarder_2.is_stopped
+        assert not forwarder_2.is_stopped()
         response: requests.Response = requests.get(url_2)
         assert response.status_code == 200
 
-    assert forwarder_1.is_stopped
+    assert forwarder_1.is_stopped()
     with pytest.raises(requests.exceptions.ConnectionError):
         response: requests.Response = requests.get(url_1)
         pytest.fail("Portforward should be closed after leaving the context manager")
 
-    assert forwarder_2.is_stopped
+    assert forwarder_2.is_stopped()
     with pytest.raises(requests.exceptions.ConnectionError):
         response: requests.Response = requests.get(url_2)
         pytest.fail("Portforward should be closed after leaving the context manager")
