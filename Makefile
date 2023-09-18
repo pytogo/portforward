@@ -48,10 +48,10 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 check: ## check style with flake8 and black - also check types
-	black --check portforward.py
-	mypy portforward.py
-	flake8 portforward.py --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 portforward.py --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
+	black --check python
+	mypy python
+	flake8 python --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 python --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/portforward.rst
