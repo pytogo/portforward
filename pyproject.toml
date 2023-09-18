@@ -39,7 +39,7 @@ tag = true
 commit = true
 
 [[tool.bumpversion.files]]
-filename = "portforward.py"
+filename = "python/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "Cargo.toml"
