@@ -34,7 +34,7 @@ module-name = "portforward._portforward"
 python-source = "python"
 
 [tool.bumpversion]
-current_version = "0.5.0"
+current_version = "0.6.0"
 tag = true
 commit = true
 
