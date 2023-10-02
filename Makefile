@@ -48,30 +48,15 @@ clean-test: ## remove test and coverage artifacts
 	rm -fr .pytest_cache
 
 check: ## check style with flake8 and black - also check types
-	black --check portforward.py
-	mypy portforward.py
-	flake8 portforward.py --count --select=E9,F63,F7,F82 --show-source --statistics
-	flake8 portforward.py --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
-
-test: ## run tests quickly with the default Python
-	python3 -m pytest
-
-test-all: ## run tests on every Python version with tox
-	tox
-
-coverage: ## check code coverage quickly with the default Python
-	coverage run --source portforward -m pytest
-	coverage report -m
-	coverage html
-	$(BROWSER) htmlcov/index.html
-
-docs-check:
-	python setup.py check -r -s
+	black --check python
+	mypy python
+	flake8 python --count --select=E9,F63,F7,F82 --show-source --statistics
+	flake8 python --count --exit-zero --max-complexity=10 --max-line-length=88 --statistics
 
 docs: ## generate Sphinx HTML documentation, including API docs
 	rm -f docs/portforward.rst
 	rm -f docs/modules.rst
-	sphinx-apidoc -o docs/ . tests setup.py
+	sphinx-apidoc -o docs/ . tests
 	$(MAKE) -C docs clean
 	$(MAKE) -C docs html
 	$(BROWSER) docs/_build/html/index.html
@@ -79,58 +64,37 @@ docs: ## generate Sphinx HTML documentation, including API docs
 servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
-install: clean ## install the package to the active Python's site-packages
-	python setup.py install
+release-linux: clean ## creates and release linux wheels
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.7 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.8 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.9 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.10 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.11 --out dist --strip
 
-# ===== LINUX =====
-release-test-linux: clean ## package and upload a release to test.pypi
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
-	python setup.py sdist
-	twine upload --repository testpypi dist/*
+	maturin sdist --out dist
 
-release-linux: clean ## package and upload a release for linux
-	setuptools-golang-build-manylinux-wheels --golang 1.16.6 --pythons "cp36-cp36m cp37-cp37m cp38-cp38 cp39-cp39 cp310-cp310 cp311-cp311"
-	python setup.py sdist
 	twine upload dist/*
 
-# ===== WINDOWS =====
-release-test-windows: ## package and upload a release to test.pypi
-	python311 setup.py bdist_wheel
-	python310 setup.py bdist_wheel
-	python39 setup.py bdist_wheel
-	python38 setup.py bdist_wheel
-	python37 setup.py bdist_wheel
-	python36 setup.py bdist_wheel
-	python39 -m twine upload --repository testpypi dist\*
+release-macos: clean ## creates and release macos wheels
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.7 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.8 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.9 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.10 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.11 --out dist --strip
 
-release-windows: ## package and upload a release for Linux
-	python311 setup.py bdist_wheel
-	python310 setup.py bdist_wheel
-	python39 setup.py bdist_wheel
-	python38 setup.py bdist_wheel
-	python37 setup.py bdist_wheel
-	python36 setup.py bdist_wheel
-	python39 -m twine upload dist\*
+	maturin build --release -i python3.7 --out dist --strip
+	maturin build --release -i python3.8 --out dist --strip
+	maturin build --release -i python3.9 --out dist --strip
+	maturin build --release -i python3.10 --out dist --strip
+	maturin build --release -i python3.11 --out dist --strip
 
-# ===== MACOS =====
-release-test-macos: clean ## package and upload a release to test.pypi
-	python3.11 setup.py bdist_wheel
-	python3.10 setup.py bdist_wheel
-	python3.9 setup.py bdist_wheel
-	python3.8 setup.py bdist_wheel
-	python3.7 setup.py bdist_wheel
-	python3.6 setup.py bdist_wheel
-	python3.9 -m twine upload --repository testpypi dist/*
+	twine upload dist/*
 
-release-macos: clean ## package and upload a release for MacOS
-	python3.11 -m pip install -r requirements-dev.txt
-	python3.10 -m pip install -r requirements-dev.txt
-	python3.9 -m pip install -r requirements-dev.txt
-	python3.8 -m pip install -r requirements-dev.txt
-	python3.7 -m pip install -r requirements-dev.txt
-	python3.11 setup.py bdist_wheel
-	python3.10 setup.py bdist_wheel
-	python3.9 setup.py bdist_wheel
-	python3.8 setup.py bdist_wheel
-	python3.7 setup.py bdist_wheel
-	python3.9 -m twine upload dist/*
+release-windows: clean ## creates and release window wheels
+	maturin build --release -i python37 --out dist --strip
+	maturin build --release -i python38 --out dist --strip
+	maturin build --release -i python39 --out dist --strip
+	maturin build --release -i python310 --out dist --strip
+	maturin build --release -i python311 --out dist --strip
+
+	twine upload dist/*

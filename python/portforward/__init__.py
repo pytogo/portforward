@@ -1,16 +1,17 @@
 """
-Kubernetes Port-Forward Go-Edition For Python
+Easy Kubernetes Port-Forward For Python
 """
 
-__version__ = "0.5.0"
+__version__ = "0.6.0"
 
+import asyncio
 import contextlib
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Iterator, Optional
+from typing import Generator, Optional
 
-import _portforward
+from portforward import _portforward
 
 
 class PortforwardError(Exception):
@@ -25,53 +26,6 @@ class LogLevel(Enum):
     OFF = 4
 
 
-class PortForwarder:
-    def __init__(
-        self,
-        namespace: str,
-        pod_or_service: str,
-        from_port: int,
-        to_port: int,
-        config_path: Optional[str] = None,
-        waiting: float = 0.1,
-        log_level: LogLevel = LogLevel.INFO,
-        kube_context: str = "",
-    ) -> None:
-        self.namespace: str = _validate_str("namespace", namespace)
-        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
-        self.from_port: int = _validate_port("from_port", from_port)
-        self.to_port: int = _validate_port("to_port", to_port)
-        self.log_level: LogLevel = _validate_log(log_level)
-        self.waiting: float = waiting
-
-        self.config_path: str = _config_path(config_path)
-        self.kube_context: str = kube_context if kube_context else ""
-
-        _kube_context(kube_context)
-
-        self.actual_pod_name: str = ""
-        self._is_stopped: bool = False
-
-    def forward(self):
-        _portforward.forward(
-            self.namespace,
-            self.pod_or_service,
-            self.from_port,
-            self.to_port,
-            self.config_path,
-            self.log_level.value,
-            self.kube_context,
-        )
-        self._is_stopped = False
-
-    def stop(self):
-        _portforward.stop(self.namespace, self.pod_or_service, self.to_port)
-        self._is_stopped = True
-
-    def is_stopped(self):
-        return self._is_stopped
-
-
 @contextlib.contextmanager
 def forward(
     namespace: str,
@@ -82,7 +36,7 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
-) -> Iterator[PortForwarder]:
+) -> Generator["PortForwarder", None, None]:
     """
     Connects to a **pod or service** and tunnels traffic from a local port to
     this target. It uses the kubectl kube config from the home dir if no path
@@ -91,9 +45,6 @@ def forward(
     The libary will figure out for you if it has to target a pod or service.
 
     It will fall back to in-cluster-config in case no kube config file exists.
-
-    Caution: Go and the port-forwarding needs some ms to be ready. ``waiting``
-    can be used to wait until the port-forward is ready.
 
     (Best consumed as context manager.)
 
@@ -143,6 +94,91 @@ def forward(
         forwarder.stop()
 
 
+class PortForwarder:
+    """Use the same args as the `portforward.forward` method."""
+
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self._async_forwarder = AsyncPortForwarder(
+            namespace,
+            pod_or_service,
+            from_port,
+            to_port,
+            config_path,
+            waiting,
+            log_level,
+            kube_context,
+        )
+
+    def forward(self):
+        asyncio.run(self._async_forwarder.forward())
+
+    def stop(self):
+        asyncio.run(self._async_forwarder.stop())
+
+    @property
+    def is_stopped(self):
+        return self._async_forwarder.is_stopped
+
+
+class AsyncPortForwarder:
+    """Use the same args as the `portforward.forward` method."""
+
+    def __init__(
+        self,
+        namespace: str,
+        pod_or_service: str,
+        from_port: int,
+        to_port: int,
+        config_path: Optional[str] = None,
+        waiting: float = 0.1,
+        log_level: LogLevel = LogLevel.INFO,
+        kube_context: str = "",
+    ) -> None:
+        self.namespace: str = _validate_str("namespace", namespace)
+        self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
+        self.from_port: int = _validate_port("from_port", from_port)
+        self.to_port: int = _validate_port("to_port", to_port)
+        self.log_level: LogLevel = _validate_log(log_level)
+        self.waiting: float = waiting
+
+        self.config_path: str = _config_path(config_path)
+        self.kube_context: str = _kube_context(kube_context)
+
+        self.actual_pod_name: str = ""
+        self._is_stopped: bool = False
+
+    async def forward(self):
+        self.actual_pod_name = await _portforward.forward(
+            self.namespace,
+            self.pod_or_service,
+            self.from_port,
+            self.to_port,
+            self.config_path,
+            self.log_level.value,
+            self.kube_context,
+        )
+        self._is_stopped = False
+
+    async def stop(self):
+        await _portforward.stop(
+            self.namespace, self.actual_pod_name, self.to_port, self.log_level.value
+        )
+        self._is_stopped = True
+
+    def is_stopped(self):
+        return self._is_stopped
+
+
 # ===== PRIVATE =====
 
 
@@ -188,9 +224,14 @@ def _config_path(config_path_arg) -> str:
     return config_path if os.path.isfile(config_path) else ""
 
 
-def _kube_context(arg):
-    if arg is None or not isinstance(arg, str):
-        raise ValueError(f"kube_context={arg} is not a valid str")
+def _kube_context(context):
+    if not context:
+        return ""
 
-    if "/" in arg:
-        raise ValueError(f"kube_context contains illegal character '/'")
+    if not isinstance(context, str):
+        raise ValueError(f"kube_context={context} is not a valid str")
+
+    if "/" in context:
+        raise ValueError("kube_context contains illegal character '/'")
+
+    return context

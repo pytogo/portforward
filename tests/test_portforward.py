@@ -1,10 +1,8 @@
-"""
-Tests for `portforward` package.
-
-!!! It will only test the Python side !!!
-"""
+import sys
 import time
-from typing import List
+
+sys.path.append(".")
+
 import uuid
 import sys
 
