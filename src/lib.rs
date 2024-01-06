@@ -76,9 +76,5 @@ fn init_log(log_level: u64) {
         _ => log::LevelFilter::Off,
     };
 
-    let init_result = env_logger::builder().filter_level(level).try_init();
-
-    if let Err(err) = init_result {
-        eprintln!("{err}");
-    }
+    let _ = env_logger::builder().filter_level(level).try_init();
 }
