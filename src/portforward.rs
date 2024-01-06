@@ -182,6 +182,7 @@ async fn forward_connection(
         .context("port not found in forwarder")?;
     tokio::io::copy_bidirectional(&mut client_conn, &mut upstream_conn).await?;
     drop(upstream_conn);
+    debug!("ended copying bidirectional");
     forwarder.join().await?;
     Ok(())
 }
