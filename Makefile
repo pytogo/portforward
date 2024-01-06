@@ -65,6 +65,7 @@ servedocs: docs ## compile the docs watching for changes
 	watchmedo shell-command -p '*.rst' -c '$(MAKE) -C docs html' -R -D .
 
 release-linux: clean ## creates and release linux wheels
+	mkdir -p dist
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.7 --out dist --strip
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.8 --out dist --strip
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.9 --out dist --strip
