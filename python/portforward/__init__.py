@@ -52,12 +52,6 @@ def forward(
         >>> import portforward
         >>> with portforward.forward("test", "web-svc", 9000, 80):
         >>>     # Do work
-        >>>
-        >>> # Or without context manager
-        >>>
-        >>> forwarder = portforward.forward("test", "some-pod", 9000, 80)
-        >>> # Do work
-        >>> forwarder.stop()
 
     :param namespace: Target namespace
     :param pod_or_service: Name of target Pod or service
