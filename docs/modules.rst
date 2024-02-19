@@ -1,4 +1,4 @@
-portforward-go
+portforward
 ==============
 
 .. toctree::
