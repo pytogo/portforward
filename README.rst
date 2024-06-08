@@ -34,9 +34,9 @@ Installation
 
 Wheels are available for:
 
-* Windows
-* MacOS X
-* Linux
+* Windows (architectures: x64, x86)
+* MacOS X (architectures: x86_64, aarch64)
+* Linux (architectures: x86_64, x86, aarch64)
 
 with Python versions:
 
@@ -45,11 +45,6 @@ with Python versions:
 * 3.10
 * 3.11
 * 3.12
-
-and architectures:
-
-* x84_64
-* arm64 (known as M1/Apple Chip - MacOS only)
 
 **Requirements for installation from source**
 
