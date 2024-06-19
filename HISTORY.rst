@@ -2,6 +2,14 @@
 History
 =======
 
+0.6.2 (2024-06-19)
+------------------
+* Allow defining binding ip
+
+0.6.1 (2024-01-25)
+------------------
+* Fixed wrong logger setup
+
 0.6.0 (2023-06-13)
 ------------------
 * Rewrite native part in Rust with support of Py03 and maturin

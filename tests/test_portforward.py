@@ -160,11 +160,23 @@ def test_forward_invalid_parameter(namespace, pod, from_port, to_port):
             pytest.fail("Should raise error before")
 
 
+def test_validate_ip_address():
+    namespace = "test_ns"
+    pod = "test_pod"
+    from_port = 9000
+    to_port = 10000
+    bind_ip = "not-an-ip-adress"
+
+    with pytest.raises(ValueError):
+        with portforward.forward(namespace, pod, from_port, to_port, bind_ip=bind_ip):
+            pytest.fail("Should raise error before")
+
+
 def test_forward_raise_error():
     """Tests the conversion of the C extension error into the Python Error"""
 
     # Arrange
-    namespace = "test" + str(uuid.uuid4())  # Should never exists
+    namespace = "test" + str(uuid.uuid4())  # Should never exist
     pod = "web"
     from_ = 9000
     to = 80

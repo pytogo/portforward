@@ -14,6 +14,7 @@ use log::*;
 use once_cell::sync::Lazy;
 use std::net::SocketAddr;
 use std::{collections::HashMap, path::Path};
+use std::str::FromStr;
 use tokio::{
     io::{AsyncRead, AsyncWrite},
     net::TcpListener,
@@ -27,7 +28,7 @@ use typed_builder::TypedBuilder;
 pub struct ForwardConfig {
     namespace: String,
     pod_or_service: String,
-    from_port: u16,
+    bind_address: String,
     to_port: u16,
     config_path: String,
     kube_context: String,
@@ -55,7 +56,7 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
 
     PORTFORWARD_REGISTRY.register(&q_name, forwarding).await;
 
-    let addr = SocketAddr::from(([127, 0, 0, 1], config.from_port));
+    let addr = SocketAddr::from_str(&config.bind_address).with_context(move || config.bind_address)?;
     let tcp_listener = TcpListener::bind(addr).await?;
     let forward_task = setup_forward_task(
         tcp_listener,
@@ -80,7 +81,7 @@ async fn load_config(
         return Ok(incluster_config);
     }
 
-    let kube_config = kube::config::Kubeconfig::read_from(config_path.clone())?;
+    let kube_config = kube::config::Kubeconfig::read_from(config_path)?;
     let mut options = kube::config::KubeConfigOptions::default();
 
     // "" is the sign for using default context
