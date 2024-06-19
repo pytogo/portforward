@@ -10,7 +10,7 @@ import ipaddress
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 
 from portforward import _portforward
 
