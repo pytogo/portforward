@@ -76,7 +76,7 @@ def forward(
         waiting,
         log_level,
         kube_context,
-        bind_ip
+        bind_ip,
     )
 
     try:
@@ -116,7 +116,7 @@ class PortForwarder:
             waiting,
             log_level,
             kube_context,
-            bind_ip
+            bind_ip,
         )
 
     def forward(self):
@@ -218,7 +218,9 @@ def _validate_ip_address(ip_address):
     if not ip_address:
         return "127.0.0.1"
 
-    if isinstance(ip_address, ipaddress.IPv4Address) or isinstance(ip_address, ipaddress.IPv4Address):
+    if isinstance(ip_address, ipaddress.IPv4Address) or isinstance(
+        ip_address, ipaddress.IPv4Address
+    ):
         return str(ip_address)
 
     return str(ipaddress.ip_address(ip_address))
