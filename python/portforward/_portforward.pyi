@@ -5,7 +5,7 @@ Rust native module / Python C Extension
 async def forward(
     namespace: str,
     pod_or_service: str,
-    from_port: int,
+    bind_address: str,
     to_port: int,
     config_path: str,
     log_level: int,

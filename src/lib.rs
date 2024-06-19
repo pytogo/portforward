@@ -9,7 +9,7 @@ fn forward(
     py: Python<'_>,
     namespace: String,
     pod_or_service: String,
-    from_port: u16,
+    bind_address: String,
     to_port: u16,
     config_path: String,
     log_level: u64,
@@ -20,7 +20,7 @@ fn forward(
     let config = portforward::ForwardConfig::builder()
         .namespace(namespace)
         .pod_or_service(pod_or_service)
-        .from_port(from_port)
+        .bind_address(bind_address)
         .to_port(to_port)
         .config_path(config_path)
         .kube_context(kube_context)

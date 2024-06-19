@@ -6,10 +6,11 @@ __version__ = "0.6.1"
 
 import asyncio
 import contextlib
+import ipaddress
 import os
 from enum import Enum
 from pathlib import Path
-from typing import Generator, Optional
+from typing import Generator, Optional, Union
 
 from portforward import _portforward
 
@@ -36,6 +37,7 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
+    bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
 ) -> Generator["PortForwarder", None, None]:
     """
     Connects to a **pod or service** and tunnels traffic from a local port to
@@ -61,6 +63,7 @@ def forward(
     :param waiting: Delay in seconds
     :param log_level: Level of logging
     :param kube_context: Target kubernetes context (fallback is current context)
+    :param bind_ip: To which IP shall the portforward be bind
     :return: forwarder to manual stop the forwarding
     """
 
@@ -73,6 +76,7 @@ def forward(
         waiting,
         log_level,
         kube_context,
+        bind_ip,
     )
 
     try:
@@ -101,6 +105,7 @@ class PortForwarder:
         waiting: float = 0.1,
         log_level: LogLevel = LogLevel.INFO,
         kube_context: str = "",
+        bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
     ) -> None:
         self._async_forwarder = AsyncPortForwarder(
             namespace,
@@ -111,6 +116,7 @@ class PortForwarder:
             waiting,
             log_level,
             kube_context,
+            bind_ip,
         )
 
     def forward(self):
@@ -137,10 +143,10 @@ class AsyncPortForwarder:
         waiting: float = 0.1,
         log_level: LogLevel = LogLevel.INFO,
         kube_context: str = "",
+        bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
     ) -> None:
         self.namespace: str = _validate_str("namespace", namespace)
         self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
-        self.from_port: int = _validate_port("from_port", from_port)
         self.to_port: int = _validate_port("to_port", to_port)
         self.log_level: LogLevel = _validate_log(log_level)
         self.waiting: float = waiting
@@ -148,14 +154,18 @@ class AsyncPortForwarder:
         self.config_path: str = _config_path(config_path)
         self.kube_context: str = _kube_context(kube_context)
 
+        _validate_port("from_port", from_port)
+        bind_ip = _validate_ip_address(bind_ip)
+
         self.actual_pod_name: str = ""
         self._is_stopped: bool = False
+        self.bind_address: str = f"{bind_ip}:{from_port}"
 
     async def forward(self):
         self.actual_pod_name = await _portforward.forward(
             self.namespace,
             self.pod_or_service,
-            self.from_port,
+            self.bind_address,
             self.to_port,
             self.config_path,
             self.log_level.value,
@@ -202,6 +212,18 @@ def _validate_log(log_level):
         raise ValueError(f"log_level={log_level} is not a valid LogLevel")
 
     return log_level
+
+
+def _validate_ip_address(ip_address):
+    if not ip_address:
+        return "127.0.0.1"
+
+    if isinstance(ip_address, ipaddress.IPv4Address) or isinstance(
+        ip_address, ipaddress.IPv4Address
+    ):
+        return str(ip_address)
+
+    return str(ipaddress.ip_address(ip_address))
 
 
 def _config_path(config_path_arg) -> str:
