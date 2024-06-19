@@ -37,7 +37,7 @@ def forward(
     waiting: float = 0.1,
     log_level: LogLevel = LogLevel.INFO,
     kube_context: str = "",
-    bind_ip: Optional[ipaddress.IPv4Address | ipaddress.IPv6Address | str] = None,
+    bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
 ) -> Generator["PortForwarder", None, None]:
     """
     Connects to a **pod or service** and tunnels traffic from a local port to
@@ -105,7 +105,7 @@ class PortForwarder:
         waiting: float = 0.1,
         log_level: LogLevel = LogLevel.INFO,
         kube_context: str = "",
-        bind_ip: Optional[ipaddress.IPv4Address | ipaddress.IPv6Address | str] = None,
+        bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
     ) -> None:
         self._async_forwarder = AsyncPortForwarder(
             namespace,
@@ -143,7 +143,7 @@ class AsyncPortForwarder:
         waiting: float = 0.1,
         log_level: LogLevel = LogLevel.INFO,
         kube_context: str = "",
-        bind_ip: Optional[ipaddress.IPv4Address | ipaddress.IPv6Address | str] = None,
+        bind_ip: Union[ipaddress.IPv4Address, ipaddress.IPv6Address, str, None] = None,
     ) -> None:
         self.namespace: str = _validate_str("namespace", namespace)
         self.pod_or_service: str = _validate_str("pod_or_service", pod_or_service)
