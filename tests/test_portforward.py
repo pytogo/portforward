@@ -124,6 +124,33 @@ def test_service_portforward_with_success(kind_cluster: KindCluster):
         response: requests.Response = requests.get(url_2)
         pytest.fail("Portforward should be closed after leaving the context manager")
 
+def test_portforward_from_port_zero_assigns_port(kind_cluster: KindCluster):
+    # Arrange
+    _create_test_resources(kind_cluster)
+
+    pod_name = "test-pod"
+    config = str(kind_cluster.kubeconfig_path.absolute())
+
+    local_port = 0  # from port
+    pod_port = 3000  # to port
+
+    pf = portforward.forward(
+        TEST_NAMESPACE,
+        pod_name,
+        local_port,
+        pod_port,
+        config_path=config,
+        kube_context=TEST_CONTEXT,
+    )
+
+    # Act & Assert
+    with pf as forwarder:
+        assert not forwarder.is_stopped()
+        assert forwarder.from_port != 0
+        url = f"http://localhost:{forwarder.from_port}/ping"
+        response: requests.Response = requests.get(url)
+        assert response.status_code == 200
+
 
 @pytest.mark.parametrize(
     "namespace,pod,from_port,to_port",
