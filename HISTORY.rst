@@ -2,6 +2,10 @@
 History
 =======
 
+0.7.0 (2024-10-18)
+------------------
+* Allow binding to a local random free port
+
 0.6.2 (2024-06-19)
 ------------------
 * Allow defining binding ip
