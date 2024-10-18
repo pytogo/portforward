@@ -57,7 +57,7 @@ def forward(
 
     :param namespace: Target namespace
     :param pod_or_service: Name of target Pod or service
-    :param from_port: Local port
+    :param from_port: Local port, or 0 to use any free port
     :param to_port: Port inside the pod
     :param config_path: Path for loading kube config
     :param waiting: Delay in seconds
@@ -129,6 +129,11 @@ class PortForwarder:
     def is_stopped(self):
         return self._async_forwarder.is_stopped
 
+    @property
+    def from_port(self):
+        """The local port that was actually used for the portforward."""
+        return self._async_forwarder.from_port
+
 
 class AsyncPortForwarder:
     """Use the same args as the `portforward.forward` method."""
@@ -158,11 +163,12 @@ class AsyncPortForwarder:
         bind_ip = _validate_ip_address(bind_ip)
 
         self.actual_pod_name: str = ""
+        self.from_port: int = 0
         self._is_stopped: bool = False
         self.bind_address: str = f"{bind_ip}:{from_port}"
 
     async def forward(self):
-        self.actual_pod_name = await _portforward.forward(
+        (self.actual_pod_name, self.from_port) = await _portforward.forward(
             self.namespace,
             self.pod_or_service,
             self.bind_address,
@@ -200,7 +206,7 @@ def _validate_str(arg_name, arg) -> str:
 
 
 def _validate_port(arg_name, arg) -> int:
-    in_range = arg and 0 < arg < 65536
+    in_range = arg is not None and 0 <= arg < 65536
     if arg is None or not isinstance(arg, int) or not in_range:
         raise ValueError(f"{arg_name}={arg} is not a valid port")
 

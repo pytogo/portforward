@@ -34,9 +34,10 @@ pub struct ForwardConfig {
     kube_context: String,
 }
 
-/// Creates a connection to a pod. It returns the actual pod name for the portforward.
+/// Creates a connection to a pod. It returns a `(pod_name, from_port)` tuple
+/// with the actual pod name and local port used for the portforward.
 /// It differs from `pod_or_service` when `pod_or_service` represents a service.
-pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
+pub async fn forward(config: ForwardConfig) -> anyhow::Result<(String, u16)> {
     debug!("{:?}", config);
 
     let client_config = load_config(&config.config_path, &config.kube_context).await?;
@@ -58,6 +59,7 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
 
     let addr = SocketAddr::from_str(&config.bind_address).with_context(move || config.bind_address)?;
     let tcp_listener = TcpListener::bind(addr).await?;
+    let from_port = tcp_listener.local_addr()?.port();
     let forward_task = setup_forward_task(
         tcp_listener,
         rx,
@@ -68,7 +70,7 @@ pub async fn forward(config: ForwardConfig) -> anyhow::Result<String> {
 
     tokio::spawn(forward_task);
 
-    return Ok(q_name.pod_name);
+    return Ok((q_name.pod_name, from_port));
 }
 
 async fn load_config(
