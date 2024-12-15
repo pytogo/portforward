@@ -199,9 +199,6 @@ def _validate_str(arg_name, arg) -> str:
     if len(arg) == 0:
         raise ValueError(f"{arg_name} cannot be an empty str")
 
-    if "/" in arg:
-        raise ValueError(f"{arg_name} contains illegal character '/'")
-
     return arg
 
 
@@ -252,8 +249,5 @@ def _kube_context(context):
 
     if not isinstance(context, str):
         raise ValueError(f"kube_context={context} is not a valid str")
-
-    if "/" in context:
-        raise ValueError("kube_context contains illegal character '/'")
 
     return context

@@ -2,6 +2,11 @@
 History
 =======
 
+0.7.1 (2024-12-15)
+------------------
+* Allow "/" in strings
+* Drop support for Python 3.8
+
 0.7.0 (2024-10-18)
 ------------------
 * Allow binding to a local random free port
