@@ -2,7 +2,7 @@
 Easy Kubernetes Port-Forward For Python
 """
 
-__version__ = "0.7.0"
+__version__ = "0.7.1"
 
 import asyncio
 import contextlib

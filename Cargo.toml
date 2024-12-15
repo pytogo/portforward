@@ -1,6 +1,6 @@
 [package]
 name = "portforward"
-version = "0.7.0"
+version = "0.7.1"
 edition = "2021"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
@@ -28,7 +28,7 @@ log = "0.4.17"
 env_logger = "0.10.0"
 # tokio
 tokio = { version = "1.27.0", features = ["full"] }
-tokio-util = "0.7.0"
+tokio-util = "0.7.1"
 tokio-stream = { version = "0.1.9", features = ["net"] }
 # k8s
 kube = { version = "^0.81.0", default-features = false, features = ["admission"] }
