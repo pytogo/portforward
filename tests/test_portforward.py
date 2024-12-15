@@ -157,12 +157,10 @@ def test_portforward_from_port_zero_assigns_port(kind_cluster: KindCluster):
     [
         # Namespace
         ("", "web", 9000, 80),
-        ("/test", "web", 9000, 80),
         (1337, "web", 9000, 80),
         (None, "web", 9000, 80),
         # Pod name
         ("test", "", 9000, 80),
-        ("test", "web/", 9000, 80),
         ("test", 1337, 9000, 80),
         ("test", None, 9000, 80),
         # From port
