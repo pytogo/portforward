@@ -34,9 +34,11 @@ Installation
 
 Wheels are available for:
 
-* Windows (architectures: x64, x86)
-* MacOS X (architectures: x86_64, aarch64)
-* Linux (architectures: x86_64, x86, aarch64)
+* **Windows** (architectures: ``x64``, ``x86``)
+* **macOS**   (architectures: ``x86_64``, ``aarch64``)
+* **Linux**   (architectures: ``x86_64``, ``x86``, ``aarch64``, ``armv7``, ``s390x``, ``ppc64le``)
+
+Musllinux wheels (Alpine‑compatible) are provided for ``x86_64``, ``x86``, ``aarch64`` and ``armv7``.
 
 with Python versions:
 
