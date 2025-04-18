@@ -2,6 +2,9 @@
 History
 =======
 
+0.7.3 (2025-04-18)
+* Fix wrong tokio-util version
+
 0.7.2 (2025-04-16)
 ------------------
 * Update dependencies
