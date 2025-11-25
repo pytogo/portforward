@@ -71,6 +71,8 @@ release-linux: clean ## creates and release linux wheels
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.10 --out dist --strip
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.11 --out dist --strip
 	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.12 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.13 --out dist --strip
+	docker run --rm -v $(PWD):/io ghcr.io/pyo3/maturin build --release -i python3.14 --out dist --strip
 
 	maturin sdist --out dist
 
@@ -82,12 +84,16 @@ release-macos: clean ## creates and release macos wheels
 	maturin build --release --target aarch64-apple-darwin --zig -i python3.10 --out dist --strip
 	maturin build --release --target aarch64-apple-darwin --zig -i python3.11 --out dist --strip
 	maturin build --release --target aarch64-apple-darwin --zig -i python3.12 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.13 --out dist --strip
+	maturin build --release --target aarch64-apple-darwin --zig -i python3.14 --out dist --strip
 
 	maturin build --release -i python3.8 --out dist --strip
 	maturin build --release -i python3.9 --out dist --strip
 	maturin build --release -i python3.10 --out dist --strip
 	maturin build --release -i python3.11 --out dist --strip
 	maturin build --release -i python3.12 --out dist --strip
+	maturin build --release -i python3.13 --out dist --strip
+	maturin build --release -i python3.14 --out dist --strip
 
 	twine upload dist/*
 
@@ -97,5 +103,7 @@ release-windows: clean ## creates and release window wheels
 	maturin build --release -i python310 --out dist --strip
 	maturin build --release -i python311 --out dist --strip
 	maturin build --release -i python312 --out dist --strip
+	maturin build --release -i python313 --out dist --strip
+	maturin build --release -i python314 --out dist --strip
 
 	twine upload dist/*
