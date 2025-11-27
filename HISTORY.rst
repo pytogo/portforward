@@ -2,7 +2,13 @@
 History
 =======
 
+0.7.4 (2025-11-27)
+------------------
+* Update dependencies
+* Add support for Python 3.13 and Python 3.14
+
 0.7.3 (2025-04-18)
+------------------
 * Fix wrong tokio-util version
 
 0.7.2 (2025-04-16)
