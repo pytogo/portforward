@@ -236,11 +236,17 @@ def _config_path(config_path_arg) -> str:
     elif config_path_arg:
         return config_path_arg
 
+    # If KUBECONFIG is set, it might be a ":" separated list of paths
+    config_path = os.environ.get("KUBECONFIG", "")
+    if config_path:
+        for path in config_path.split(os.pathsep):
+            path = path.strip()
+            if path and os.path.isfile(path):
+                return path
+
+    # Fallback to the alternate path
     alt_path = str(Path.home() / ".kube" / "config")
-
-    config_path = os.environ.get("KUBECONFIG", alt_path)
-
-    return config_path if os.path.isfile(config_path) else ""
+    return alt_path if os.path.isfile(alt_path) else ""
 
 
 def _kube_context(context):
