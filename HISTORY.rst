@@ -2,6 +2,10 @@
 History
 =======
 
+0.7.5 (2025-12-12)
+------------------
+* Correctly handle multi-path KUBECONFIG values (fix)
+
 0.7.4 (2025-11-27)
 ------------------
 * Update dependencies
