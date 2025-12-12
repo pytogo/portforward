@@ -4,7 +4,7 @@ build-backend = "maturin"
 
 [project]
 name = "portforward"
-version = "0.7.4"
+version = "0.7.5"
 authors = [{ name = "Sebastian Ziemann", email = "corka149@mailbox.org" }]
 description = "Easy Kubernetes Port-Forward For Python"
 readme = "README.rst"
@@ -37,7 +37,7 @@ module-name = "portforward._portforward"
 python-source = "python"
 
 [tool.bumpversion]
-current_version = "0.7.4"
+current_version = "0.7.5"
 tag = true
 commit = true
 
