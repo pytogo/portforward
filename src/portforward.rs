@@ -91,9 +91,49 @@ async fn load_config(
         options.context = Some(kube_context.to_string());
     }
 
-    let client_config = kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
+    // Some clusters (e.g., AKS private link) require a specific TLS SNI that
+    // is provided via `tls-server-name` in kubeconfig. kube-rs' OpenSSL backend
+    // does not honor this, which then causes hostname mismatch errors when
+    // connecting to the apiserver. We default to rustls and also explicitly set
+    // tls_server_name when it is missing from the resolved client config.
+    let tls_server_name = resolve_tls_server_name(&kube_config, &options);
+
+    let mut client_config =
+        kube::config::Config::from_custom_kubeconfig(kube_config, &options).await?;
+
+    if client_config.tls_server_name.is_none() {
+        if let Some(server_name) = tls_server_name {
+            debug!("setting tls_server_name from kubeconfig: {}", server_name);
+            client_config.tls_server_name = Some(server_name);
+        }
+    }
 
     Ok(client_config)
+}
+
+fn resolve_tls_server_name(
+    kube_config: &kube::config::Kubeconfig,
+    options: &kube::config::KubeConfigOptions,
+) -> Option<String> {
+    let context_name = options
+        .context
+        .as_deref()
+        .or(kube_config.current_context.as_deref())?;
+
+    let context = kube_config
+        .contexts
+        .iter()
+        .find(|c| c.name == context_name)?;
+    let context = context.context.as_ref()?;
+    let cluster_name = context.cluster.as_str();
+
+    let cluster = kube_config
+        .clusters
+        .iter()
+        .find(|c| c.name == cluster_name)?;
+
+    let cluster = cluster.cluster.as_ref()?;
+    cluster.tls_server_name.clone()
 }
 
 /// Tries to find a pod by the given or name or checks if it is a service
