@@ -49,3 +49,6 @@ filename = "python/portforward/__init__.py"
 
 [[tool.bumpversion.files]]
 filename = "Cargo.toml"
+
+[[tool.bumpversion.files]]
+filename = "Cargo.lock"

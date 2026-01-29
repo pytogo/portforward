@@ -2,6 +2,11 @@
 History
 =======
 
+0.7.6 (2026-02-20)
+------------------
+- Default to rustls-tls as the TLS backend
+- Fix TLS hostname mismatch by honoring tls-server-name
+
 0.7.5 (2025-12-12)
 ------------------
 * Correctly handle multi-path KUBECONFIG values (fix)
