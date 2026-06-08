@@ -1,3 +1,10 @@
+::
+        This library is in maintenance mode. I will review and merge small pull requests when
+        needed, e.g for bugfixes. I won't transfer ownership to keep trust in this library and
+        to protect the users of this library against supply chain attacks. But I am willing place
+        references here to a new library when someone has an awesome idea for new enhanced version.
+        You may ask why. The burden is to big for me to keep up with two ecosystem in my spare time.
+
 ===========
 portforward
 ===========
