@@ -54,13 +54,15 @@ with Python versions:
 * 3.11
 * 3.12
 * 3.13
+* 3.14
+* 3.15
 
 **Requirements for installation from source**
 
 The following things are required when there is no wheel available for the target system.
 
 * `Rust` installed and available in the path (https://www.rust-lang.org/tools/install)
-* `Python` (at least v3.7 - below was never tested but might work)
+* `Python` (at least v3.9)
 
 Pip knows how to install ``portforward``.
 
