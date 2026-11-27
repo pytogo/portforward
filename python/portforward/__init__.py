@@ -168,7 +168,7 @@ class AsyncPortForwarder:
         self.bind_address: str = f"{bind_ip}:{from_port}"
 
     async def forward(self):
-        (self.actual_pod_name, self.from_port) = await _portforward.forward(
+        self.actual_pod_name, self.from_port = await _portforward.forward(
             self.namespace,
             self.pod_or_service,
             self.bind_address,

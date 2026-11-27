@@ -2,6 +2,11 @@
 History
 =======
 
+Unreleased
+----------
+* Add support for Python 3.15 (update PyO3 to 0.30)
+* Drop support for Python 3.7 and 3.8 (no longer supported by PyO3)
+
 0.7.6 (2026-02-20)
 ------------------
 - Default to rustls-tls as the TLS backend

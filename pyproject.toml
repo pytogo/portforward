@@ -8,20 +8,19 @@ version = "0.7.6"
 authors = [{ name = "Sebastian Ziemann", email = "corka149@mailbox.org" }]
 description = "Easy Kubernetes Port-Forward For Python"
 readme = "README.rst"
-requires-python = ">=3.7"
+requires-python = ">=3.9"
 classifiers = [
     "Programming Language :: Rust",
     "Programming Language :: Python :: Implementation :: CPython",
     "Programming Language :: Python :: Implementation :: PyPy",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.7",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
     "Programming Language :: Python :: 3.14",
+    "Programming Language :: Python :: 3.15",
 ]
 license = { text = "MIT License" }
 keywords = ["portforward", "kubernetes", "k8s"]
